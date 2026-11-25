@@ -82,7 +82,7 @@ test('classic has a primary campus CTA, seven distinct backgrounds and keyboard-
   const variants = await page.locator('[data-classic-scene]').evaluateAll(elements => elements.map(element => element.getAttribute('data-classic-scene')));
   expect(new Set(variants).size).toBe(7);
   await expect(page.locator('main canvas')).toHaveCount(0);
-  const layer = page.getByRole('button', { name: /User Interface/ });
+  const layer = page.getByRole('button', { name: 'User Interface', exact: true });
   await layer.focus();
   await page.keyboard.press('Enter');
   await expect(layer).toHaveAttribute('aria-pressed', 'true');
@@ -126,14 +126,51 @@ for (const width of [320,390,768]) {
   });
 }
 
-test('classic artwork has a visible reserved area even with reduced motion', async ({ page }) => {
-  await page.setViewportSize({width:390,height:844});
+
+
+test('classic immersive sections preserve all seven scene identities and full-size artwork', async ({page})=>{
+  await page.setViewportSize({width:1440,height:900});
   await page.goto('/classic/');
-  const art = page.locator('#about .classic-art-static');
-  await expect(art).toBeVisible();
-  await expect(art).toHaveCSS('opacity','1');
-  const artBox = await art.boundingBox();
-  expect(artBox?.height).toBeGreaterThan(180);
-  const title = await page.locator('#about h2').boundingBox();
-  expect(artBox!.y).toBeGreaterThan(title!.y+title!.height);
+  await expect(page.locator('.immersive-section')).toHaveCount(6);
+  for (const section of await page.locator('.immersive-section').all()) {
+    const art=section.locator('.classic-backdrop');
+    await expect(art).toBeVisible();
+    const [artBox,sectionBox]=await Promise.all([art.boundingBox(),section.boundingBox()]);
+    expect(artBox!.width).toBeGreaterThan(sectionBox!.width*.95);
+    expect(artBox!.height).toBeGreaterThan(sectionBox!.height*.95);
+    await expect(section.locator('.glass-card')).toHaveCount(0);
+    await expect(section.locator('.immersive-navigation button[aria-pressed=true]')).toHaveCount(1);
+  }
+});
+test('classic drag snaps to a new information point and keyboard selection stays synchronized', async ({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto('/classic/#about');
+  const section=page.locator('#about');
+  const selector=section.locator('.immersive-navigation');
+  await expect(selector.getByRole('button',{name:'Software Architecture'})).toHaveAttribute('aria-pressed','true');
+  const area=section.locator('[data-scene-drag-area]');
+  await area.scrollIntoViewIfNeeded();
+  const b=await area.boundingBox();
+  const x=b!.x+b!.width*.65,y=b!.y+b!.height*.5;
+  await page.mouse.move(x,y);
+  await page.mouse.down();
+  await page.mouse.move(x-140,y,{steps:12});
+  await page.mouse.up();
+  await expect(selector.getByRole('button',{name:'Full-Stack Development'})).toHaveAttribute('aria-pressed','true');
+  await expect(section.getByRole('heading',{name:'Full-Stack Development'})).toBeVisible();
+  await selector.getByRole('button',{name:'Technical Leadership'}).focus();
+  await page.keyboard.press('Enter');
+  await expect(section.getByRole('heading',{name:'Technical Leadership'})).toBeVisible();
+  await section.getByRole('button',{name:'Next point'}).click();
+  await expect(section.getByRole('heading',{name:'Software Architecture'})).toBeVisible();
+});
+test('all architecture layers are accessible on mobile with reduced motion',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/classic/#architecture');
+  const section=page.locator('#architecture');
+  await expect(section.locator('.immersive-navigation button')).toHaveCount(9);
+  await section.getByRole('button',{name:'Security & Permissions',exact:true}).click();
+  await expect(section.getByRole('heading',{name:'Security & Permissions',exact:true})).toBeVisible();
+  await expect(section.locator('.classic-art-static')).toBeVisible();
+  await expect(section.locator('canvas')).toHaveCount(0);
 });

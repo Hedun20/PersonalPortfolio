@@ -86,3 +86,9 @@ performance, keyboard camera movement or full cross-browser compatibility.
 Each classic section has its own decorative geometry. WebGL is mounted only while its background is visible, with a capped pixel ratio and a static decorative fallback for reduced motion or rendering failure. The campus remains the home route; its normal 3D and motion switches are intentionally removed, while the loading escape and non-WebGL project directory remain available. Architecture descriptions are always readable and layer selection supports keyboard and touch.
 
 The Playwright suite checks navigation, reduced-motion fallback, architecture interaction and responsive widths. Visual fidelity and real-GPU performance still need browser verification with motion enabled.
+
+## Classic immersive presentation
+
+Home retains its original neural-network hero. The other six Classic sections use the same reusable full-slide scene and information interface: the models sit behind the editorial text, numbered hotspots and a keyboard/touch-accessible point list select the information, and horizontal drag snaps to the nearest point. Dragging does not take over vertical touch scrolling. Reduced motion and failed WebGL retain the SVG scene and all selectors; no additional packages are needed. Architecture has nine accessible layers and project/contact links remain functional. The existing campus routes and mobile list are unchanged.
+
+Visual acceptance must include normal-motion desktop and mobile testing, checking geometry scale, readability, drag direction, marker alignment, smooth snapping, fallback and GPU load. The automated reduced-motion tests exercise layout, point selection, wrapping and drag-to-select without requiring a GPU.
