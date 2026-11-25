@@ -76,7 +76,7 @@ export default function Hero() {
             Building intelligent systems, scalable software, and private AI infrastructure.
           </motion.p>
 
-          <motion.div variants={itemVariants} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <motion.div variants={itemVariants} className="mt-12 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
             <a
               href="#projects"
               className="group relative px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide bg-accent-primary text-bg-primary font-semibold hover:bg-sky-300 transition-all duration-300 shadow-lg shadow-accent-primary/20"
@@ -97,11 +97,10 @@ export default function Hero() {
             </a>
           </motion.div>
         </motion.div>
-
       </div>
 
       {/* Scroll indicator */}
-        <motion.div
+      <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2, duration: 1 }}
@@ -109,7 +108,7 @@ export default function Hero() {
         >
           <span className="text-xs text-text-secondary tracking-widest uppercase">Scroll</span>
           <div className="w-px h-10 bg-gradient-to-b from-accent-primary/60 to-transparent animate-pulse" />
-        </motion.div>
+      </motion.div>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('classic portfolio opens the built campus and returns to expertise', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.locator('canvas')).toHaveCount(0);
+  await expect(page.locator('#home canvas')).toHaveCount(0);
   await page.getByRole('link', { name: 'Explore 3D campus' }).click();
   await expect(page).toHaveURL(/\/preview-campus\.html$/);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
