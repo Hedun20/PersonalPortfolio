@@ -1,33 +1,26 @@
 # Development Progress
 
-> **Last updated:** 2026-11-25 · branch `feat/chatgpt-campus` · HEAD `eff47d8`
+> **Last updated:** 2026-11-25 · integration review based on `dadb251` · candidate, not accepted.
 
 ## Current Snapshot
 
-### Test results (run today, at HEAD `eff47d8`)
-- ✅ **Build** — `npm run build` succeeds: `✓ built in 834ms`
-  - `dist/index.html` 0.59 kB (gzip 0.37 kB)
-  - `dist/assets/index-*.css` 39.04 kB (gzip 6.52 kB)
-  - `dist/assets/index-*.js` **1,350.37 kB** (gzip 379.43 kB) — still one oversized chunk, unchanged from the Stage 1 baseline
-- ❌ **Lint** — `npm run lint` exits 1 with **7 errors, 0 warnings**:
-  - `src/components/three/CampusVisuals.tsx:40:5` — 1 error
-  - `src/components/three/EngineeringCampus.tsx:721, 725, 756, 761, 885` — 6 errors
-  - All 7 are `Cannot modify local variables after render completes` / `This value cannot be modified` (React 19 compiler rules) in files that are **untracked work in progress**.
-  - Every file touched by this task (`Navbar.tsx`, `Contact.tsx`, `sections.ts`, `contact.ts`) lints clean.
-- ✅ **Manual checks pending** — no browser verification has been done yet; nav anchors and the contact CTA need a visual pass at desktop and mobile widths.
+### Confirmed repository changes
+- `eff47d8`: shared contact and navigation data, dead link fix, README.
+- `6900550`: campus preview and five facilities, interior/workflow interactions, 3D controls.
+- `dadb251`: targeted fixes for seven React Hooks immutability lint diagnostics in CampusVisuals and EngineeringCampus. Diff inspected. Local agent reported clean lint and successful build on its checkout; no independent browser verification.
+- This candidate: expose the existing campus from the classic hero, include its HTML entry in Vite production build, retain classic anchor links, improve mobile navigation and reduced-motion behavior, add production smoke tests.
 
-### Blockers
-1. **Lint gate is red for reasons outside this task.** The 7 errors live in `CampusVisuals.tsx` / `EngineeringCampus.tsx`, which are untracked and being actively edited. They are deliberately untouched, so `npm run lint` will keep failing until that work lands. Stage commits are made with explicit paths so this WIP is never staged.
-2. **Contact links are placeholders.** `src/data/contact.ts` ships `TODO` values on purpose — real URLs are needed before deploy.
-3. **`opencode.json` is deleted** in the working tree with an untracked `opencode.json.bak` alongside. Left alone; flagging it so it is not mistaken for task fallout.
+### Verification and blockers
+- No lint/build/browser run on this candidate SHA yet. Run the README commands before acceptance. The available remote repository connection does not provide a local dependency installation or browser runtime.
+- Prior build warning: oversized JavaScript chunk (~1.35 MB before this candidate). Measure new build before claiming any improvement.
+- Actual WebGL rendering, animation, camera controls, interior navigation, and responsive visual quality still require manual browser checks.
+- Contact email/LinkedIn values are placeholders. Obtain owner-confirmed public contact details before publication.
+- `opencode.json.bak` is tracked. No obvious secret field was found in this review; keep it out of deployment and review local configuration separately.
 
 ### Exact next step
-**Stage 3 — Accessibility** (not started). Concretely:
-1. Add a `@media (prefers-reduced-motion: reduce)` block to `src/index.css` that neutralises `animate-fade-up`, `animate-fade-in`, `animate-marquee` and transform transitions.
-2. Add `focus-visible:` variants beside the existing `hover:` / `group-hover:` classes in `Hero.tsx`, `About.tsx`, `Expertise.tsx`, `Architecture.tsx`, `Projects.tsx`, `TechStack.tsx`, `Contact.tsx`.
-3. In `Hero.tsx`, skip mounting `NeuralNetwork3D` when `matchMedia('(prefers-reduced-motion: reduce)').matches`.
+Run lint, build, and Playwright smoke tests against the candidate, then visually review the campus on desktop and mobile (including normal motion/WebGL). Resolve failures before merging. Continue the existing roadmap rather than create replacement scenes.
 
-> Stage numbering below is the original plan. The agreed execution order for this task is **1 bugs → 3 accessibility → 2 navigation → 4 bundle/3D performance → 5 SEO/social**, one commit per stage.
+> The historical roadmap below remains in place. Implementation does not equal acceptance; unchecked stages must be verified before closure.
 
 ## Stage 1 — Audit & Baseline ✅
 - [x] Read full project structure and all source files

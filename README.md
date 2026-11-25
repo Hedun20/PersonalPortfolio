@@ -6,7 +6,7 @@ an animated nuclear reactor and an Inkling character that reacts to the reader.
 
 ## Prerequisites
 
-- Node.js 18 or newer
+- Node.js 22.12+ (or a newer supported LTS release)
 
 ## Getting started
 
@@ -16,6 +16,8 @@ npm run dev
 ```
 
 The dev server runs at <http://localhost:5173>.
+The interactive campus is available from the hero link or at `/preview-campus.html`.
+The classic portfolio and campus are both production build entries.
 
 ## Common commands
 
@@ -59,7 +61,23 @@ Two conventions are worth knowing before adding a section:
   `threejs-react`, `bloom`, `postprocessing`). Anything that imports them ends up
   in the main bundle, so keep new scenes out of components the page loads on
   first paint unless they are actually rendered.
-- `src/preview/` and the `preview-*.html` files are scratch scenes for iterating
-  on 3D work. They are not linked from the site.
+- `preview-campus.html` is the interactive campus entry linked from the classic hero.
+  `preview-inkling.html` remains a development-only scratch preview.
 - The contact links and location in `src/data/contact.ts` are placeholders
   (`TODO` markers) and need to be filled in before publishing.
+
+
+## Browser smoke tests
+
+After installing dependencies, run:
+
+```bash
+npm run lint
+npm run build
+npx playwright install chromium
+npx playwright test
+```
+
+These checks cover production navigation, mobile menu behavior and the accessible
+campus directory with 3D disabled. They do not certify the WebGL scene's visuals,
+performance, keyboard camera movement or full cross-browser compatibility.

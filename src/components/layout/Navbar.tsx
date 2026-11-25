@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { SECTIONS, SECTION_LABELS } from '../../data/sections';
@@ -12,7 +12,8 @@ const navItems = SECTIONS.map((id) => ({
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(() => window.scrollY > 20);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -21,22 +22,27 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    const desktop = window.matchMedia('(min-width: 64rem)');
+    const onDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setIsOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    desktop.addEventListener('change', onDesktop);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+      desktop.removeEventListener('change', onDesktop);
+    };
   }, [isOpen]);
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const id = e.currentTarget.getAttribute('href')?.replace('#', '');
-    if (!id) return;
-    setIsOpen(false);
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <header
@@ -49,7 +55,7 @@ export default function Navbar() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
-        <a href="#home" onClick={handleNavClick} className="flex items-center gap-2 group">
+        <a href="#home" onClick={() => setIsOpen(false)} className="flex items-center gap-2 group">
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center font-heading font-bold text-bg-primary text-sm transition-transform duration-300 group-hover:scale-105">
             IA
           </div>
@@ -59,13 +65,13 @@ export default function Navbar() {
         </a>
 
         {/* Desktop Nav */}
-        <ul className="hidden md:flex items-center gap-1">
+        <ul className="hidden lg:flex items-center gap-1">
           {navItems.map((item) => (
             <li key={item.href}>
               <a
                 href={item.href}
-                onClick={handleNavClick}
-                className="px-3 py-2 text-sm text-text-secondary hover:text-accent-primary transition-colors duration-200 rounded-md hover:bg-white/5"
+                onClick={() => setIsOpen(false)}
+                className="px-2 xl:px-3 py-2 text-sm text-text-secondary hover:text-accent-primary transition-colors duration-200 rounded-md hover:bg-white/5"
               >
                 {item.label}
               </a>
@@ -75,7 +81,11 @@ export default function Navbar() {
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden p-2 text-text-secondary hover:text-accent-primary transition-colors rounded-md hover:bg-white/5"
+          className="lg:hidden p-2 text-text-secondary hover:text-accent-primary transition-colors rounded-md hover:bg-white/5"
+          ref={toggleRef}
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls="mobile-navigation"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -85,18 +95,17 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        className={cn(
-          'fixed inset-0 top-[65px] z-40 bg-bg-primary/98 backdrop-blur-lg transition-all duration-300 md:hidden',
-          isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
-        )}
+        id="mobile-navigation"
+        hidden={!isOpen}
+        className="fixed inset-0 top-[65px] z-40 overflow-y-auto overscroll-contain bg-bg-primary/98 backdrop-blur-lg lg:hidden"
       >
-        <ul className="flex flex-col items-center gap-2 pt-8">
+        <ul className="flex flex-col items-center gap-2 py-8">
           {navItems.map((item) => (
             <li key={item.href}>
               <a
                 href={item.href}
-                onClick={handleNavClick}
-                className="px-6 py-3 text-lg font-heading text-text-main hover:text-accent-primary transition-colors"
+                onClick={() => setIsOpen(false)}
+                className="block px-6 py-3 text-lg font-heading text-text-main hover:text-accent-primary transition-colors"
               >
                 {item.label}
               </a>

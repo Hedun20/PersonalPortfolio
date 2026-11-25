@@ -754,12 +754,14 @@ function useKeyboardPan() {
   const keys=useCampusKeys();
   const {camera}=useThree();
   // Reused scratch vectors live in a ref so the pan loop keeps one allocation per instance.
-  const scratch=useRef({ forward:new THREE.Vector3(), right:new THREE.Vector3(), delta:new THREE.Vector3() });
+  const scratch=useRef<{ forward: THREE.Vector3; right: THREE.Vector3; delta: THREE.Vector3 } | null>(null);
+  if (scratch.current === null) scratch.current = { forward:new THREE.Vector3(), right:new THREE.Vector3(), delta:new THREE.Vector3() };
   return (target:THREE.Vector3,dt:number,speed:number)=>{
     const pressed=keys.current;
     const x=Number(pressed.has('d')||pressed.has('arrowright'))-Number(pressed.has('a')||pressed.has('arrowleft'));
     const z=Number(pressed.has('w')||pressed.has('arrowup'))-Number(pressed.has('s')||pressed.has('arrowdown'));
     if(!x&&!z)return false;
+    if (!scratch.current) return false;
     const {forward,right,delta}=scratch.current;
     camera.getWorldDirection(forward);forward.y=0;forward.normalize();
     right.set(-forward.z,0,forward.x);
@@ -1060,7 +1062,7 @@ function SceneReady({onReady}:{onReady:()=>void}) {
 }
 export default function EngineeringCampus() {
   const [ready,setReady]=useState(false);
-  const [show3D,setShow3D]=useState(true);
+  const [show3D,setShow3D]=useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [slowStart,setSlowStart]=useState(false);
   const [sceneFailed,setSceneFailed]=useState(false);
   const onReady=useCallback(()=>setReady(true),[]);
@@ -1123,13 +1125,13 @@ export default function EngineeringCampus() {
       {intro&&motion&&<div className="campus-cinematic-overlay"><div><p>TYMUR ABBASOV / SOFTWARE &amp; AI ENGINEERING</p><h3>Enter the system.</h3><span>An interactive engineering portfolio. Five facilities, one connected world.</span></div><button type="button" onClick={()=>{stopIntro();requestAnimationFrame(()=>mapRef.current?.focus({preventScroll:true}));}}>Skip intro →</button></div>}
       <header className="campus-header">
         <div className="campus-heading"><p className="campus-kicker">INTERACTIVE ENGINEERING PORTFOLIO</p>{active?<h2>Engineering <span>avenue.</span></h2>:<h1>Tymur <span>Abbasov.</span></h1>}<p className="campus-role">Full-stack engineer · Local AI &amp; LLM systems</p>{!active&&<p className="campus-intro-copy">A city built around my work. Explore the buildings to discover projects, architecture and engineering workflows.</p>}
-          {!active&&<div className="campus-arrival-links"><a className="campus-classic-link" href={window.location.pathname.endsWith('/preview-campus.html')?'/#projects':'#projects'}>View projects ↗</a><a className="campus-classic-link" href={window.location.pathname.endsWith('/preview-campus.html')?'/#contact':'#contact'}>Get in touch ↗</a></div>}
+          {!active&&<div className="campus-arrival-links"><a className="campus-classic-link" href={window.location.pathname.endsWith('/preview-campus.html')?'./#projects':'#projects'}>View projects ↗</a><a className="campus-classic-link" href={window.location.pathname.endsWith('/preview-campus.html')?'./#contact':'#contact'}>Get in touch ↗</a></div>}
           <div className="campus-stage-label"><span aria-hidden="true"/><div>{active?`${interior?'INTERIOR':'FACILITY'} ${active.label} / ${active.name}`:'DISTRICT OVERVIEW / MULTILEVEL TRANSIT'}</div></div>
         </div>
         <div className="campus-controls" aria-label="Scene settings">
           <button type="button" ref={mapRef} onClick={returnToMap}>⌖ City overview</button>
           {active&&<button type="button" className="campus-enter-button" onClick={toggleInterior}>{interior?'Return to exterior':'Enter facility ↗'}</button>}
-          {show3D?<button type="button" onClick={playIntro} disabled={!motion||!ready}>Play intro</button>:<button type="button" onClick={enable3D}>Enable 3D</button>}
+          {show3D?<><button type="button" onClick={playIntro} disabled={!motion||!ready}>Play intro</button><button type="button" onClick={onUnavailable}>Disable 3D</button></>:<button type="button" onClick={enable3D}>Enable 3D</button>}
           <button type="button" onClick={() => {setIntro(false);setMotion(value => !value);}} aria-pressed={motion}>Motion {motion ? 'on' : 'off'}</button>
         </div>
       </header>
@@ -1150,7 +1152,7 @@ export default function EngineeringCampus() {
       </div>
       <button className="campus-interior-link" type="button" aria-expanded={demoOpen} onClick={()=>{if(demoOpen){setDemoOpen(false);}else{setInterior(true);setDemoOpen(true);}}}>{demoOpen?'Close workflow demo':'Run interactive project demo ↗'}</button>
       {demoOpen&&<CampusProjectDemo key={active.id} id={active.id} motion={motion} onStep={setTopic}/>}
-      <a className="campus-spatial-link" href={window.location.pathname.endsWith('/preview-campus.html')?`/${active.section}`:active.section}>{dossier.route} <span aria-hidden="true">↗</span></a>
+      <a className="campus-spatial-link" href={window.location.pathname.endsWith('/preview-campus.html')?`./${active.section}`:active.section}>{dossier.route} <span aria-hidden="true">↗</span></a>
       <div className="campus-spatial-nav"><button type="button" disabled={activeIndex<=0} onClick={()=>goTo(zones[activeIndex-1].id)}>← Previous</button><span>{active.label} / 05</span><button type="button" disabled={activeIndex>=zones.length-1} onClick={()=>goTo(zones[activeIndex+1].id)}>Next →</button></div>
     </aside>}
     <nav className="campus-directory" aria-label="Engineering avenue facilities">

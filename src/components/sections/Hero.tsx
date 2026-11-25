@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { easeOut } from 'framer-motion';
+import { motion, easeOut, useReducedMotion } from 'framer-motion';
 import NeuralNetwork3D from '../three/NeuralNetwork3D';
 
 const containerVariants = {
@@ -21,6 +20,7 @@ const itemVariants = {
 };
 
 export default function Hero() {
+  const reduceMotion = useReducedMotion();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -33,11 +33,11 @@ export default function Hero() {
   return (
     <div
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      onMouseMove={handleMouseMove}
+      onMouseMove={reduceMotion ? undefined : handleMouseMove}
     >
       {/* Three.js Neural Network Background */}
       <div className="absolute inset-0 z-0">
-        <NeuralNetwork3D mouseX={mousePos.x} mouseY={mousePos.y} />
+        {!reduceMotion && <NeuralNetwork3D mouseX={mousePos.x} mouseY={mousePos.y} />}
       </div>
 
       {/* Atmospheric overlay */}
@@ -54,7 +54,7 @@ export default function Hero() {
       />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      <div className="relative z-10 text-center px-6 py-28 max-w-5xl mx-auto">
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <motion.p variants={itemVariants} className="section-label mb-6 tracking-wider">
             INTELLIGENCE ARCHITECT
@@ -62,7 +62,7 @@ export default function Hero() {
 
           <motion.h1
             variants={itemVariants}
-            className="font-heading text-5xl font-bold leading-[1.08] sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-glow"
+            className="font-heading text-4xl font-bold leading-[1.08] sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-glow"
           >
             Engineering Intelligence.{' '}
             <br />
@@ -79,20 +79,18 @@ export default function Hero() {
           <motion.div variants={itemVariants} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="#projects"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
-              }}
               className="group relative px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide bg-accent-primary text-bg-primary font-semibold hover:bg-sky-300 transition-all duration-300 shadow-lg shadow-accent-primary/20"
             >
               Explore My Work
             </a>
             <a
+              href="./preview-campus.html"
+              className="px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide border border-border-accent/50 text-text-main hover:border-accent-primary/60 hover:bg-white/[0.03] transition-all duration-300"
+            >
+              Explore 3D campus
+            </a>
+            <a
               href="#contact"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-              }}
               className="px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide border border-border-accent/50 text-text-main hover:border-accent-primary/60 hover:bg-white/[0.03] transition-all duration-300"
             >
               Get in Touch
@@ -100,17 +98,18 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Scroll indicator */}
+      </div>
+
+      {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          className="absolute z-10 bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
         >
           <span className="text-xs text-text-secondary tracking-widest uppercase">Scroll</span>
           <div className="w-px h-10 bg-gradient-to-b from-accent-primary/60 to-transparent animate-pulse" />
         </motion.div>
-      </div>
     </div>
   );
 }
