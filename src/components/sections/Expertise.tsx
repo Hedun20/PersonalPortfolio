@@ -1,3 +1,4 @@
+import ClassicBackdrop from '../three/ClassicBackdrop';
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Brain, Code2, LayoutGrid, Building2, Server, Bot } from 'lucide-react';
@@ -26,7 +27,7 @@ function ExpertiseCard({ title, description, technologies, icon: Icon, index }: 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="glass-card p-6 sm:p-8 group hover:border-accent-primary/30 transition-all duration-500"
+      className="glass-card classic-card p-6 sm:p-8 group hover:border-accent-primary/30 transition-all duration-500"
     >
       <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-primary/[0.06] text-accent-primary group-hover:bg-accent-primary/[0.12] transition-colors duration-300">
         <Icon className="h-6 w-6" />
@@ -39,7 +40,7 @@ function ExpertiseCard({ title, description, technologies, icon: Icon, index }: 
       <p className="text-sm text-text-secondary leading-relaxed mb-5">{description}</p>
 
       {/* Technology tags */}
-      <div className="flex flex-wrap gap-2">
+      <div className="mt-auto flex flex-wrap gap-2">
         {technologies.map((tech) => (
           <span
             key={tech}
@@ -61,7 +62,7 @@ const expertiseData = [
     title: 'Artificial Intelligence',
     description:
       'Local LLM deployment, RAG pipelines, OCR, embeddings, and intelligent agent orchestration for private AI systems.',
-    technologies: ['Qwen', 'Gemma', 'RAG', 'OCR', 'LangChain'],
+    technologies: ['Qwen', 'Gemma', 'RAG', 'OCR', 'Embeddings'],
     iconName: 'Brain',
   },
   {
@@ -106,17 +107,18 @@ export default function Expertise() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="expertise" className="relative py-24 sm:py-32">
+    <section id="expertise" className="classic-section relative py-24 sm:py-32">
+      <ClassicBackdrop variant="expertise" />
       {/* Background accent */}
       <div className="absolute bottom-1/4 left-0 w-[500px] h-[500px] rounded-full opacity-[0.02] blur-[120px] bg-accent-primary pointer-events-none" />
 
-      <div ref={ref} className="section-container">
+      <div ref={ref} className="section-container classic-content">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5 }}
-          className="text-center max-w-3xl mx-auto mb-16 sm:mb-20"
+          className="classic-section-header"
         >
           <p className="section-label mb-4">Expertise</p>
           <h2 className="section-title text-text-main">
@@ -125,7 +127,7 @@ export default function Expertise() {
         </motion.div>
 
         {/* Cards grid */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto relative z-[1]">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mx-auto relative z-[1]">
           {expertiseData.map((item, i) => (
             <ExpertiseCard
               key={item.title}

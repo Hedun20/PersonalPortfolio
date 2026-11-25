@@ -1,3 +1,4 @@
+import ClassicBackdrop from '../three/ClassicBackdrop';
 import { motion } from 'framer-motion';
 import { easeOut } from 'framer-motion';
 import { Mail, GitFork, Link, MapPin, ArrowUpRight } from 'lucide-react';
@@ -57,7 +58,7 @@ function ContactLink({ icon: Icon, label, href, description, index }: ContactLin
           </h3>
           <ArrowUpRight className="h-4 w-4 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex-shrink-0" />
         </div>
-        <p className="text-sm text-text-secondary leading-relaxed">{description}</p>
+        <p className="text-sm text-text-secondary leading-relaxed break-words">{description}</p>
       </div>
     </motion.a>
   );
@@ -67,17 +68,19 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="relative py-24 sm:py-32 overflow-hidden"
+      className="classic-section relative py-24 sm:py-32 overflow-hidden"
     >
+      <ClassicBackdrop variant="contact" />
       {/* Background accent */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-[0.03] blur-[120px] bg-accent-secondary pointer-events-none" />
 
-      <div className="section-container relative z-10">
+      <div className="section-container classic-content">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
+          className="classic-section-header"
         >
           <motion.p variants={itemVariants} className="section-label mb-4 tracking-wider">
             GET IN TOUCH
@@ -92,7 +95,7 @@ export default function Contact() {
           </motion.h2>
           <motion.p
             variants={itemVariants}
-            className="text-text-secondary text-lg max-w-2xl leading-relaxed mb-16"
+            className="text-text-secondary text-lg max-w-2xl mx-auto leading-relaxed"
           >
             I&apos;m always interested in discussing new opportunities, creative projects,
             or collaborations at the intersection of AI and software engineering.
@@ -100,7 +103,7 @@ export default function Contact() {
         </motion.div>
 
         {/* Contact links grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {contactLinks.map((link, index) => (
             <ContactLink
               key={link.key}

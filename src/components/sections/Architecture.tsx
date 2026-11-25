@@ -1,3 +1,4 @@
+import ClassicBackdrop from '../three/ClassicBackdrop';
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { architectureNodes, type ArchitectureNode } from '../../data/architecture';
@@ -14,43 +15,20 @@ const layerNames = [
   'Security Foundation',
 ];
 
-function ArchitectureNodeCard({
-  node,
-  isActive,
-  onMouseEnter,
-  onMouseLeave,
-}: {
+function ArchitectureNodeCard({ node, isActive, onSelect }: {
   node: ArchitectureNode;
   isActive: boolean;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
+  onSelect: () => void;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0.6, scale: 0.97 }}
-      whileHover={{ opacity: 1, scale: 1.02 }}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className={`glass-card p-4 sm:p-5 cursor-pointer transition-all duration-300 ${isActive ? 'border-accent-primary/40 bg-bg-elevated/60' : 'hover:border-accent-primary/20'}`}
-    >
-      <div className="flex items-center gap-3 mb-2">
-        <div
-          className={`w-2 h-2 rounded-full transition-colors duration-300 ${isActive ? 'bg-accent-primary shadow-lg shadow-accent-primary/40' : 'bg-text-secondary/50'}`}
-        />
-        <h4 className="font-heading text-sm font-semibold text-text-main">{node.label}</h4>
-      </div>
-      {isActive && (
-        <motion.p
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          className="text-xs text-text-secondary leading-relaxed pt-1"
-        >
-          {node.description}
-        </motion.p>
-      )}
-    </motion.div>
+    <button type="button" aria-pressed={isActive} onClick={onSelect}
+      className={`glass-card architecture-card w-full text-left p-4 sm:p-5 transition-colors duration-300 ${isActive ? 'border-accent-primary/60 bg-bg-elevated/60' : 'hover:border-accent-primary/30'}`}>
+      <span className="flex items-center gap-3 mb-2">
+        <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${isActive ? 'bg-accent-primary' : 'bg-text-secondary/50'}`} />
+        <span className="font-heading text-sm font-semibold text-text-main">{node.label}</span>
+      </span>
+      <span className="block text-sm text-text-secondary leading-relaxed">{node.description}</span>
+    </button>
   );
 }
 
@@ -59,18 +37,19 @@ export default function Architecture() {
   const [activeNode, setActiveNode] = useState<string | null>(null);
 
   return (
-    <section id="architecture" className="relative py-24 sm:py-32 overflow-hidden">
+    <section id="architecture" className="classic-section relative py-24 sm:py-32 overflow-hidden">
+      <ClassicBackdrop variant="architecture" />
       {/* Background accent */}
       <div className="absolute top-1/3 right-0 w-[500px] h-[600px] rounded-full opacity-[0.015] blur-[120px] bg-accent-primary pointer-events-none" />
 
-      <div ref={ref} className="section-container">
+      <div ref={ref} className="section-container classic-content">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center max-w-3xl mx-auto mb-8"
+          className="classic-section-header classic-section-header--compact"
         >
           <p className="section-label mb-4">AI Architecture</p>
           <h2 className="section-title text-text-main">
@@ -83,7 +62,7 @@ export default function Architecture() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="mt-4 text-text-secondary max-w-xl mx-auto"
           >
-            Interactive visualization of the intelligent system layers and their connections.
+            A conceptual reference architecture for private AI systems — select a layer to highlight it.
           </motion.p>
         </motion.div>
 
@@ -105,15 +84,14 @@ export default function Architecture() {
 
               {/* Layer label */}
               <div className="flex items-center gap-4">
-                <span className="text-xs text-text-secondary/60 font-heading w-16 shrink-0 hidden sm:block">
+                <span className="text-xs text-text-secondary font-heading w-24 shrink-0 hidden sm:block">
                   {layerNames[i]}
                 </span>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <ArchitectureNodeCard
                     node={node}
                     isActive={activeNode === node.id}
-                    onMouseEnter={() => setActiveNode(node.id)}
-                    onMouseLeave={() => setActiveNode(null)}
+                    onSelect={() => setActiveNode(current => current === node.id ? null : node.id)}
                   />
                 </div>
               </div>

@@ -1,3 +1,4 @@
+import ClassicBackdrop from '../three/ClassicBackdrop';
 import { useRef } from 'react';
 import { motion, useInView, easeOut } from 'framer-motion';
 
@@ -5,7 +6,7 @@ const aboutSections = [
   {
     title: 'Software Architecture',
     description:
-      'Designing scalable, maintainable systems that balance technical excellence with business requirements. From monoliths to microservices, I architect solutions built for the long term.',
+      'Designing maintainable application architectures, clear API boundaries, and data models that support real business workflows.',
   },
   {
     title: 'Full-Stack Development',
@@ -20,7 +21,7 @@ const aboutSections = [
   {
     title: 'Technical Leadership',
     description:
-      'Guiding engineering teams through complex technical decisions. Setting standards for code quality, system design, and architectural patterns.',
+      'Coordinating technical delivery, aligning engineering decisions with operational needs, and establishing maintainable development practices.',
   },
 ];
 
@@ -38,26 +39,27 @@ export default function About() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section id="about" className="relative py-24 sm:py-32 overflow-hidden">
+    <section id="about" className="classic-section relative py-24 sm:py-32 overflow-hidden">
+      <ClassicBackdrop variant="about" />
       {/* Background accent */}
       <div className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full opacity-[0.02] blur-[120px] bg-accent-secondary pointer-events-none" />
 
-      <div ref={ref} className="section-container">
+      <div ref={ref} className="section-container classic-content">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5 }}
-          className="max-w-3xl mb-16 sm:mb-20"
+          className="classic-section-header"
         >
           <p className="section-label mb-4">About</p>
           <h2 className="section-title text-text-main">
-            Architecting intelligent systems with precision and purpose.
+            Building reliable software, from interface to infrastructure.
           </h2>
         </motion.div>
 
         {/* Content grid */}
-        <div className="grid gap-6 md:grid-cols-2 max-w-5xl">
+        <div className="grid gap-6 md:grid-cols-2">
           {aboutSections.map((section, i) => (
             <motion.div
               key={section.title}

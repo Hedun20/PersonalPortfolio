@@ -86,14 +86,13 @@ function NeuralNetwork({ mouseX, mouseY }: NeuralNetwork3DProps) {
     return new Float32Array(edgePositions);
   }, []);
 
-  useFrame(() => {
-    if (pointsRef.current) {
-      pointsRef.current.rotation.y = mouseX * 0.15;
-      pointsRef.current.rotation.x = mouseY * 0.15;
-    }
+  useFrame((_, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += 0.001;
-      groupRef.current.rotation.x += 0.0005;
+      const dt = Math.min(delta, 0.05);
+      groupRef.current.rotation.y += dt * 0.07;
+      groupRef.current.rotation.x += dt * 0.035;
+      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, mouseX * 0.24, 1 - Math.exp(-dt * 3));
+      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, -mouseY * 0.18, 1 - Math.exp(-dt * 3));
     }
   });
 
@@ -108,10 +107,10 @@ function NeuralNetwork({ mouseX, mouseY }: NeuralNetwork3DProps) {
       >
         <PointMaterial
           color="#38BDF8"
-          size={0.04}
+          size={0.055}
           sizeAttenuation
           transparent
-          opacity={0.7}
+          opacity={0.85}
           depthWrite={false}
         />
       </Points>
@@ -127,7 +126,7 @@ function NeuralNetwork({ mouseX, mouseY }: NeuralNetwork3DProps) {
         <lineBasicMaterial
           color="#38BDF8"
           transparent
-          opacity={0.08}
+          opacity={0.17}
           depthWrite={false}
         />
       </lineSegments>
@@ -144,6 +143,7 @@ export default function NeuralNetwork3D({ mouseX, mouseY }: NeuralNetwork3DProps
         height: '100%',
         background: 'transparent',
       }}
+      dpr={[1, 1.25]}
       gl={{ alpha: true, antialias: false }}
     >
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.3}>

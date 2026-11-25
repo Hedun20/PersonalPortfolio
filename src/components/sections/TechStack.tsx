@@ -1,3 +1,4 @@
+import ClassicBackdrop from '../three/ClassicBackdrop';
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 
@@ -69,7 +70,7 @@ function TechItem({ name, index }: { name: string; index: number }) {
       className="group flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/[0.02] border border-border-subtle hover:border-accent-primary/20 hover:bg-white/[0.04] transition-all duration-300"
     >
       <div className="w-1 h-1 rounded-full bg-accent-primary/40 group-hover:bg-accent-primary group-hover:shadow-lg group-hover:shadow-accent-primary/40 transition-all duration-300" />
-      <span className="text-sm text-text-secondary group-hover:text-text-main transition-colors duration-300">
+      <span className="text-sm min-w-0 break-words text-text-secondary group-hover:text-text-main transition-colors duration-300">
         {name}
       </span>
     </motion.div>
@@ -81,14 +82,15 @@ export default function TechStack() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="techstack" className="relative py-24 sm:py-32 overflow-hidden">
-      <div ref={ref} className="section-container">
+    <section id="techstack" className="classic-section relative py-24 sm:py-32 overflow-hidden">
+      <ClassicBackdrop variant="techstack" />
+      <div ref={ref} className="section-container classic-content">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5 }}
-          className="text-center max-w-3xl mx-auto mb-16 sm:mb-20"
+          className="classic-section-header"
         >
           <p className="section-label mb-4">Technology Stack</p>
           <h2 className="section-title text-text-main">
@@ -97,7 +99,7 @@ export default function TechStack() {
         </motion.div>
 
         {/* Category grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto relative z-[1]">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mx-auto relative z-[1]">
           {techCategories.map((category, ci) => (
             <motion.div
               key={category.name}
@@ -112,7 +114,7 @@ export default function TechStack() {
                 <h3 className="font-heading font-semibold">{category.name}</h3>
               </div>
 
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2.5 min-[520px]:grid-cols-2">
                 {category.items.map((item, i) => (
                   <TechItem key={item} name={item} index={i + ci * 4} />
                 ))}

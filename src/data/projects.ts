@@ -10,7 +10,7 @@ export const projectsData: ProjectData[] = [
   {
     name: 'THAI / Bright Mind',
     description:
-      'A local-first AI platform for private document processing, OCR, RAG-based retrieval, intelligent agents, and permission-aware business workflows.',
+      'A local-first document intelligence platform under active development, focused on OCR, retrieval, local models and permission-aware workflows.',
     technologies: ['OCR', 'RAG', 'Embeddings', 'Local LLMs', 'RBAC'],
     focus: 'Private AI & Document Intelligence',
     color: '#38BDF8',
@@ -19,7 +19,7 @@ export const projectsData: ProjectData[] = [
     name: 'Enterprise CRM',
     description:
       'A full-stack business management platform featuring scalable backend architecture, role-based permissions, document management, and workflow automation.',
-    technologies: ['React', 'Node.js', 'PostgreSQL', 'TypeScript'],
+    technologies: ['React', 'Node.js', 'TypeScript', 'REST APIs'],
     focus: 'Enterprise Software Architecture',
     color: '#8B5CF6',
   },

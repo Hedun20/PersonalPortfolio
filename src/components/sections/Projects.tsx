@@ -1,6 +1,8 @@
+import ClassicBackdrop from '../three/ClassicBackdrop';
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { projectsData } from '../../data/projects';
 
 interface ProjectCardProps {
   name: string;
@@ -9,16 +11,18 @@ interface ProjectCardProps {
   focus: string;
   color: string;
   index: number;
+  href: string;
+  action: string;
 }
 
-function ProjectCard({ name, description, technologies, focus, color, index }: ProjectCardProps) {
+function ProjectCard({ name, description, technologies, focus, color, index, href, action }: ProjectCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.6, delay: index * 0.12 }}
-      className="group relative glass-card p-6 sm:p-8 overflow-hidden hover:border-accent-primary/30 transition-all duration-500"
+      className="group relative glass-card classic-card p-6 sm:p-8 overflow-hidden hover:border-accent-primary/30 transition-all duration-500"
     >
       {/* Top accent line */}
       <div
@@ -50,10 +54,10 @@ function ProjectCard({ name, description, technologies, focus, color, index }: P
       </div>
 
       {/* Interactive hover indicator */}
-      <div className="flex items-center gap-2 text-sm font-heading text-text-secondary group-hover:text-accent-primary transition-colors duration-300">
-        <span>Explore</span>
-        <ArrowRight size={16} className="-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" />
-      </div>
+      <a href={href} className="mt-auto inline-flex self-start items-center gap-2 text-sm font-heading text-accent-primary hover:text-text-main transition-colors">
+        <span>{action}</span>
+        <ArrowRight size={16} aria-hidden="true" />
+      </a>
 
       {/* Subtle glow on hover */}
       <div
@@ -64,39 +68,11 @@ function ProjectCard({ name, description, technologies, focus, color, index }: P
   );
 }
 
-const projectsData = [
-  {
-    name: 'THAI / Bright Mind',
-    description:
-      'A local-first AI platform for private document processing, OCR, RAG-based retrieval, intelligent agents, and permission-aware business workflows.',
-    technologies: ['OCR', 'RAG', 'Embeddings', 'Local LLMs', 'RBAC'],
-    focus: 'Private AI & Document Intelligence',
-    color: '#38BDF8',
-  },
-  {
-    name: 'Enterprise CRM',
-    description:
-      'A full-stack business management platform featuring scalable backend architecture, role-based permissions, document management, and workflow automation.',
-    technologies: ['React', 'Node.js', 'PostgreSQL', 'TypeScript'],
-    focus: 'Enterprise Software Architecture',
-    color: '#8B5CF6',
-  },
-  {
-    name: 'AI Automation Infrastructure',
-    description:
-      'Systems that connect intelligent models, software tools, APIs, and automated engineering workflows into cohesive operational pipelines.',
-    technologies: ['AI Agents', 'APIs', 'Workflows', 'Automation'],
-    focus: 'Intelligent System Integration',
-    color: '#34D399',
-  },
-  {
-    name: 'Interactive Engineering Experiments',
-    description:
-      'Explorations at the intersection of local AI models, intelligent agents, real-time 3D interfaces, and advanced web technologies.',
-    technologies: ['Three.js', 'Local LLMs', 'WebGL', 'React'],
-    focus: 'Research & Creative Engineering',
-    color: '#F472B6',
-  },
+const projectActions = [
+  { href: '#architecture', action: 'View AI architecture' },
+  { href: '#expertise', action: 'View software expertise' },
+  { href: '#techstack', action: 'View technology stack' },
+  { href: '../', action: 'Visit T3 Campus' },
 ];
 
 export default function Projects() {
@@ -104,17 +80,18 @@ export default function Projects() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="projects" className="relative py-24 sm:py-32 overflow-hidden">
+    <section id="projects" className="classic-section relative py-24 sm:py-32 overflow-hidden">
+      <ClassicBackdrop variant="projects" />
       {/* Background accent */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full opacity-[0.015] blur-[150px] bg-accent-secondary pointer-events-none" />
 
-      <div ref={ref} className="section-container">
+      <div ref={ref} className="section-container classic-content">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5 }}
-          className="text-center max-w-3xl mx-auto mb-16 sm:mb-20"
+          className="classic-section-header"
         >
           <p className="section-label mb-4">Projects</p>
           <h2 className="section-title text-text-main">
@@ -123,9 +100,9 @@ export default function Projects() {
         </motion.div>
 
         {/* Projects grid */}
-        <div className="grid gap-6 sm:grid-cols-2 max-w-5xl mx-auto relative z-[1]">
+        <div className="grid gap-6 sm:grid-cols-2 mx-auto relative z-[1]">
           {projectsData.map((project, i) => (
-            <ProjectCard key={project.name} index={i} {...project} />
+            <ProjectCard key={project.name} index={i} {...project} {...projectActions[i]} />
           ))}
         </div>
       </div>

@@ -80,3 +80,9 @@ npx playwright test
 These checks cover production navigation, mobile menu behavior and the accessible
 campus directory with 3D disabled. They do not certify the WebGL scene's visuals,
 performance, keyboard camera movement or full cross-browser compatibility.
+
+## Classic portfolio visual layer
+
+Each classic section has its own decorative geometry. WebGL is mounted only while its background is visible, with a capped pixel ratio and a static decorative fallback for reduced motion or rendering failure. The campus remains the home route; its normal 3D and motion switches are intentionally removed, while the loading escape and non-WebGL project directory remain available. Architecture descriptions are always readable and layer selection supports keyboard and touch.
+
+The Playwright suite checks navigation, reduced-motion fallback, architecture interaction and responsive widths. Visual fidelity and real-GPU performance still need browser verification with motion enabled.
