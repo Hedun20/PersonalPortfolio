@@ -45,7 +45,7 @@ export default function ImmersiveSection({id,number,label,heading,intro,items,fo
     setActive(next);
   }
   function start(event: PointerEvent<HTMLElement>) {
-    if (event.button!==0 || !event.isPrimary || (event.target as HTMLElement).closest('button,a')) return;
+    if (event.button!==0 || !event.isPrimary || (event.target as Element).closest('button,a')) return;
     gesture.current = {pointer:event.pointerId,startX:event.clientX,startY:event.clientY,startAngle:rotation.current,moved:false};
   }
   function move(event: PointerEvent<HTMLElement>) {
@@ -71,7 +71,7 @@ export default function ImmersiveSection({id,number,label,heading,intro,items,fo
     if (drag.moved) select(nearestPoint(rotation.current,items.length));
   }
   return <section id={id} className="immersive-section" aria-labelledby={`${id}-heading`} style={{'--scene-color':colors[id]} as React.CSSProperties}>
-    <div className={`immersive-stage${dragging?' is-dragging':''}`} onPointerDown={start} onPointerMove={move} onPointerUp={finish} onPointerCancel={e=>finish(e,true)} onLostPointerCapture={e=>finish(e,true)} onPointerLeave={e=>{if(!gesture.current?.moved)finish(e,true);}}>
+    <div className={`immersive-stage${dragging?' is-dragging':''}`} onPointerDown={start} onPointerMove={move} onPointerUp={e=>finish(e)} onPointerCancel={e=>finish(e,true)} onLostPointerCapture={e=>finish(e,true)} onPointerLeave={e=>{if(!gesture.current?.moved)finish(e,true);}}>
       <ClassicBackdrop variant={id} interaction={{rotation,markers,count:items.length,active}}/>
       <div className="immersive-scrim" aria-hidden="true"/>
       <div ref={markers} className="immersive-markers">

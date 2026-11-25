@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { nearestPoint, snapAngle } from '../src/utils/classicRotation';
 
 test('home opens the campus directly, with professional links and classic expertise', async ({ page }) => {
   await page.goto('/');
@@ -173,4 +174,15 @@ test('all architecture layers are accessible on mobile with reduced motion',asyn
   await expect(section.getByRole('heading',{name:'Security & Permissions',exact:true})).toBeVisible();
   await expect(section.locator('.classic-art-static')).toBeVisible();
   await expect(section.locator('canvas')).toHaveCount(0);
+});
+
+test('rotation snap chooses the intended point across repeated revolutions',()=>{
+  for(const count of [3,4,5,6,9]) for(let i=0;i<count;i++) for(let turn=-10;turn<=10;turn++){
+    const current=turn*.85;
+    const angle=snapAngle(i,count,current);
+    expect(nearestPoint(angle,count)).toBe(i);
+    expect(Math.abs(angle-current)).toBeLessThanOrEqual(Math.PI+1e-9);
+  }
+  expect(nearestPoint(-140*.012,4)).toBe(1);
+  expect(nearestPoint(140*.012,4)).toBe(3);
 });

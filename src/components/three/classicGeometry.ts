@@ -16,20 +16,20 @@ function cube([x,y,z]: Vec, size: number): Segment[] {
 function geometry(variant: Variant): Segment[] {
   if (variant === 'home') return [0,.5,1,1.5,2,2.5].flatMap(tilt => ring(2.5,tilt));
   if (variant === 'about') {
-    const helix = (i: number, side: number): Vec => [Math.cos(i*.19+side*Math.PI)*1.35, (i-24)*.115, Math.sin(i*.19+side*Math.PI)*1.35];
+    const helix = (i: number, side: number): Vec => [Math.cos(i*.23+side*Math.PI)*1.85, (i-24)*.125, Math.sin(i*.23+side*Math.PI)*1.85];
     return Array.from({length:48},(_,i) => {
       const pair: Segment[] = [[helix(i,0),helix(i+1,0)],[helix(i,1),helix(i+1,1)]];
       if (i%3===0) pair.push([helix(i,0),helix(i,1)]);
       return pair;
     }).flat();
   }
-  if (variant === 'expertise') return [-1,1].flatMap(x=>[-1,1].flatMap(y=>[-1,1].flatMap(z=>cube([x*1.05,y*1.05,z*1.05],.66))));
-  if (variant === 'architecture') return [-2,-1,0,1,2].flatMap((y,i) => {
-    const r = 2.05-i*.12;
+  if (variant === 'expertise') return [-1,1].flatMap(x=>[-1,1].flatMap(y=>[-1,1].flatMap(z=>cube([x*1.38,y*1.38,z*1.38],.86))));
+  if (variant === 'architecture') return Array.from({length:9},(_,i)=>(i-4)*.59).flatMap((y,i) => {
+    const r = 2.45-i*.075;
     const corners: Vec[] = [[-r,y,-r],[r,y,-r],[r,y,r],[-r,y,r]];
     const result: Segment[] = corners.map((p,j)=>[p,corners[(j+1)%4]]);
     result.push([corners[0],corners[2]],[corners[1],corners[3]]);
-    if (i<4) result.push([[0,y,0],[0,y+1,0]]);
+    if (i<8) result.push([[0,y,0],[0,y+.59,0]]);
     return result;
   });
   if (variant === 'projects') {

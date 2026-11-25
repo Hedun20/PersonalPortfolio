@@ -1,4 +1,4 @@
-import { Component, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { Component, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import { useInView, useReducedMotion } from 'framer-motion';
@@ -52,6 +52,17 @@ function AnimatedArt({ variant, interaction }: { variant: Variant; interaction?:
   const core = useRef<Group>(null);
   const position = useRef(new Vector3());
   const projected = useRef(new Vector3());
+  const count = interaction?.count ?? 0;
+  const rails = useMemo<Vec[]>(()=>{
+    if (!count) return [];
+    const result: Vec[]=[];
+    for(let i=0;i<96;i++) {
+      const a=i*Math.PI/48,b=(i+1)*Math.PI/48;
+      result.push([3*Math.sin(a),.25*Math.sin(a*2),3*Math.cos(a)],[3*Math.sin(b),.25*Math.sin(b*2),3*Math.cos(b)]);
+    }
+    for(let i=0;i<count;i++) { const p=hotspot(i,count);result.push([p[0]*.65,p[1]*.65,p[2]*.65],p); }
+    return result;
+  },[count]);
   useFrame(({ clock, camera, viewport, size },delta) => {
     if (!group.current || !core.current) return;
     const dt = Math.min(delta,.05);
@@ -63,9 +74,9 @@ function AnimatedArt({ variant, interaction }: { variant: Variant; interaction?:
     g.position.y = 0;
     const elapsed = clock.elapsedTime;
     if (interaction) {
-      g.rotation.y = MathUtils.damp(g.rotation.y, interaction.rotation.current, 9, dt);
-      core.current.rotation.y += dt * .16;
-      core.current.rotation.x = .18 + Math.sin(elapsed*.35)*.12;
+      g.rotation.y = MathUtils.damp(g.rotation.y, interaction.rotation.current + Math.sin(elapsed*.4)*.055, 9, dt);
+      core.current.rotation.y = 0;
+      core.current.rotation.x = .12 + Math.sin(elapsed*.35)*.08;
       g.updateMatrixWorld(true);
       const buttons = interaction.markers.current?.children;
       if (buttons) for (let i=0; i<interaction.count; i++) {
@@ -86,6 +97,7 @@ function AnimatedArt({ variant, interaction }: { variant: Variant; interaction?:
     }
   });
   return <group ref={group}>
+    {!!count&&<Line points={rails} segments color={colors[variant]} lineWidth={1.4} transparent opacity={.48} depthWrite={false}/>}
     <group ref={core}>
       <Line points={vertices[variant]} segments color={colors[variant]} lineWidth={5} transparent opacity={.17} depthWrite={false} />
       <Line points={vertices[variant]} segments color={colors[variant]} lineWidth={2.1} transparent opacity={.95} depthWrite={false} />
@@ -99,7 +111,7 @@ function AnimatedArt({ variant, interaction }: { variant: Variant; interaction?:
       </mesh>
     </group>
     {interaction && Array.from({length:interaction.count},(_,i)=><group key={i} position={hotspot(i,interaction.count)}>
-      <mesh><sphereGeometry args={[i===interaction.active?.12:.065,12,8]}/><meshBasicMaterial color={i===interaction.active?'#e8fbff':colors[variant]}/></mesh>
+      <mesh><sphereGeometry args={[i===interaction.active ? .12 : .065,12,8]}/><meshBasicMaterial color={i===interaction.active?'#e8fbff':colors[variant]}/></mesh>
       {i===interaction.active&&<mesh><sphereGeometry args={[.25,12,8]}/><meshBasicMaterial color={colors[variant]} wireframe transparent opacity={.5}/></mesh>}
     </group>)}
   </group>;
