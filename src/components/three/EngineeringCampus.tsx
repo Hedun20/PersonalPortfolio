@@ -353,7 +353,7 @@ function DetailInstances({ items, glowing = false }: { items: DetailBox[]; glowi
   </instancedMesh>;
 }
 
-// Three connected neighbourhoods, with clear radial streets and perimeter sidewalks.
+// Three outer infrastructure rings surround the facility network.
 function MetropolitanBackdrop() {
   const narrow=useThree(state=>state.size.width<900);
   const {structures,lights}=useMemo(()=>{

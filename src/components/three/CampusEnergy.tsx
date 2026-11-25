@@ -35,7 +35,8 @@ const fragmentShader = `
   uniform vec3 uColor;
   void main() {
     float x = fract(vUv.x * uPackets - uTime * uSpeed + uPhase);
-    float head = exp(-pow((x - 0.68) * 10.0, 2.0));
+    float distanceToHead = (x - 0.68) * 10.0;
+    float head = exp(-distanceToHead * distanceToHead);
     float tail = exp(-abs(x - 0.60) * 8.0) * 0.65;
     float across = abs(vUv.y * 2.0 - 1.0);
     float spine = exp(-across * across * 20.0);
@@ -135,8 +136,40 @@ const channels: Channel[] = [
   { radius: 46.7, width: .95, height: -.065, end: 1.68, color: '#4bbfdd', speed: .4, phase: .75, packets: 11 },
 ];
 
+const plasmaVertex = `
+  varying vec3 vLocal;
+  varying vec3 vNormal;
+  varying vec3 vView;
+  void main() {
+    vLocal = position;
+    vNormal = normalize(normalMatrix * normal);
+    vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+    vView = -viewPosition.xyz;
+    gl_Position = projectionMatrix * viewPosition;
+  }
+`;
+const plasmaFragment = `
+  varying vec3 vLocal;
+  varying vec3 vNormal;
+  varying vec3 vView;
+  uniform float uTime;
+  void main() {
+    vec3 p = normalize(vLocal);
+    float stripe = 0.5 + 0.5 * sin(p.y * 20.0 + p.x * 7.0 + sin(p.z * 12.0 + uTime) * 1.8 - uTime * 2.2);
+    float filament = stripe * stripe * stripe * stripe;
+    float rim = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
+    rim *= rim;
+    float beat = 0.90 + 0.10 * sin(uTime * 2.3);
+    vec3 color = (vec3(0.025, 0.16, 0.31) + vec3(0.09, 0.58, 1.02) * filament + vec3(0.40, 1.12, 1.55) * rim) * beat;
+    gl_FragColor = vec4(color, 1.0);
+    #include <colorspace_fragment>
+  }
+`;
+
 function FusionCore({ motion }: { motion: boolean }) {
   const plasma = useRef<THREE.Mesh>(null);
+  const plasmaMaterial = useRef<THREE.ShaderMaterial>(null);
+  const plasmaUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
   const field = useRef<THREE.Group>(null);
   const elapsed = useRef(0);
   useFrame((_, dt) => {
@@ -144,6 +177,7 @@ function FusionCore({ motion }: { motion: boolean }) {
     elapsed.current += Math.min(dt, .05);
     const t = elapsed.current;
     if (plasma.current) plasma.current.scale.setScalar(1 + .055 * Math.sin(t * 2.3));
+    if (plasmaMaterial.current) plasmaMaterial.current.uniforms.uTime.value = t;
     if (field.current) field.current.rotation.y = t * .19;
   });
   return <group position={[0, .02, CENTER_Z]} raycast={NO_RAYCAST}>
@@ -153,7 +187,7 @@ function FusionCore({ motion }: { motion: boolean }) {
       <torusGeometry args={[radius,i===1?.065:.035,8,80]}/><meshStandardMaterial color="#5bd9ff" emissive={i===1?'#89ddff':'#4ca2ef'} emissiveIntensity={i===1?2.8:1.7} toneMapped={false}/>
     </mesh>)}
     <mesh ref={plasma} position={[0,.38,0]}>
-      <sphereGeometry args={[1.58,32,20,0,TAU,0,Math.PI/2]}/><meshStandardMaterial color="#96eaff" emissive="#67dfff" emissiveIntensity={2.6} roughness={.25} toneMapped={false}/>
+      <sphereGeometry args={[1.58,32,20,0,TAU,0,Math.PI/2]}/><shaderMaterial ref={plasmaMaterial} uniforms={plasmaUniforms} vertexShader={plasmaVertex} fragmentShader={plasmaFragment} toneMapped={false}/>
     </mesh>
     <mesh position={[0,.38,0]}>
       <sphereGeometry args={[2.08,24,12,0,TAU,0,Math.PI/2]}/><meshBasicMaterial color="#70caff" wireframe transparent opacity={.22} depthWrite={false} toneMapped={false}/>
@@ -178,12 +212,12 @@ export function CampusEnergy({ motion, focused }: { motion: boolean; focused: bo
   return <group>
     <FusionCore motion={motion}/>
     {channels.map((channel,index)=> (!narrow || index!==9) && <RingChannel key={channel.radius} channel={channel} motion={motion}/>)}
-    {[-1.42, -0.84, 0, .84, 1.42].map(angle=><PeripheralFeed key={angle} angle={angle} motion={motion && !focused}/>)}
+    {[-1.68,-1.12,-.56,0,.56,1.12,1.68].filter((_,i)=>!narrow||i%2===0).map(angle=><PeripheralFeed key={angle} angle={angle} motion={motion && !focused} end={narrow?35.7:46.7}/>)}
   </group>;
 }
 
-function PeripheralFeed({ angle, motion }: { angle: number; motion: boolean }) {
-  // Short feeds terminate at the first outer ring, avoiding the five buildings.
-  const geometry = useMemo(() => radialGeometry(angle, 22, 26.0, .52, -.045), [angle]);
-  return <EnergyRibbon geometry={geometry} color="#6bbfff" speed={.6} phase={angle} packets={2} motion={motion}/>;
+function PeripheralFeed({ angle, motion, end }: { angle: number; motion: boolean; end: number }) {
+  // The previous road-spoke corridors are clear of tower footprints; use them as energy feeds.
+  const geometry = useMemo(() => radialGeometry(angle, 22, end, .48, -.045), [angle,end]);
+  return <EnergyRibbon geometry={geometry} color="#6bbfff" speed={.6} phase={angle} packets={5} motion={motion}/>;
 }
