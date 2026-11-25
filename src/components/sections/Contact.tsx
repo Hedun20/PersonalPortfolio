@@ -70,7 +70,6 @@ export default function Contact() {
       id="contact"
       className="classic-section relative py-24 sm:py-32 overflow-hidden"
     >
-      <ClassicBackdrop variant="contact" />
       {/* Background accent */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-[0.03] blur-[120px] bg-accent-secondary pointer-events-none" />
 
@@ -82,6 +81,7 @@ export default function Contact() {
           viewport={{ once: true, margin: '-80px' }}
           className="classic-section-header"
         >
+          <ClassicBackdrop variant="contact" />
           <motion.p variants={itemVariants} className="section-label mb-4 tracking-wider">
             GET IN TOUCH
           </motion.p>

@@ -2,28 +2,37 @@
 .classic-portfolio { --classic-width: 72rem; }
 .classic-portfolio .classic-section { position: relative; isolation: isolate; overflow: clip; padding-block: clamp(4.5rem, 8vw, 8rem); border-top: 1px solid rgba(56,189,248,.09); }
 .classic-portfolio .classic-content { position: relative; z-index: 2; max-width: var(--classic-width); min-width: 0; }
-.classic-section-header { text-align: center; max-width: 48rem; margin: 0 auto clamp(2.5rem,5vw,4.5rem); }
+.classic-section-header { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: clamp(260px, 28vw, 350px); padding-right: 45%; text-align: left; margin: 0 0 2.75rem; }
+.classic-section-header > :not(.classic-backdrop) { position: relative; z-index: 1; }
+.classic-section-header > p { margin-inline: 0; }
 .classic-section-header--compact { margin-bottom: 2.5rem; }
 .classic-portfolio .section-title { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -.035em; line-height: 1.12; text-wrap: balance; }
 .classic-portfolio .glass-card { min-width: 0; background: linear-gradient(145deg,rgba(17,24,39,.87),rgba(8,15,24,.84)); border-color: rgba(125,211,252,.13); box-shadow: 0 12px 36px rgba(0,0,0,.12); backdrop-filter: none; }
 .classic-portfolio .glass-card:hover { border-color: rgba(125,211,252,.32); }
 .classic-card { display: flex; flex-direction: column; height: 100%; }
-.classic-backdrop { position: absolute; z-index: 0; inset: 0 0 auto; height: min(100%, 48rem); overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 75% 30%,rgba(56,189,248,.055),transparent 65%); }
-.classic-backdrop[data-classic-scene="home"] { height: 100%; background: radial-gradient(ellipse at 50% 48%,rgba(56,189,248,.085),transparent 62%); }
-.classic-art-stage { position: absolute; width: min(72%, 58rem); height: 100%; right: -7%; top: 0; opacity: .60; mask-image: radial-gradient(ellipse at center,#000 25%,transparent 74%); }
-.classic-backdrop[data-classic-scene="expertise"] .classic-art-stage, .classic-backdrop[data-classic-scene="projects"] .classic-art-stage, .classic-backdrop[data-classic-scene="contact"] .classic-art-stage { left: -8%; right: auto; }
-.classic-backdrop[data-classic-scene="home"] .classic-art-stage { width: 100%; inset: 0; opacity: 1; mask-image: none; }
+.classic-backdrop { position: absolute; z-index: 0; inset: 0 0 0 auto; width: 42%; overflow: hidden; pointer-events: none; }
+.classic-backdrop[data-classic-scene="home"] { width: 100%; height: 100%; inset: 0; background: radial-gradient(ellipse at 50% 48%,rgba(56,189,248,.14),transparent 72%); }
+.classic-art-stage { position: absolute; inset: 0; overflow: hidden; border-radius: 1rem; background: radial-gradient(ellipse at center,rgba(56,189,248,.12),transparent 72%); }
+.classic-art-stage::before { content: ""; position: absolute; inset: 0; opacity: .35; background-image: linear-gradient(rgba(125,211,252,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(125,211,252,.10) 1px,transparent 1px); background-size: 28px 28px; mask-image: radial-gradient(ellipse,#000 20%,transparent 73%); }
+.classic-backdrop[data-classic-scene="home"] .classic-art-stage { background: none; border-radius: 0; }
 .classic-art-static, .classic-art-live { position: absolute; inset: 0; width: 100%; height: 100%; }
-.classic-art-static { opacity: .58; }
-.classic-art-stage:has(canvas) .classic-art-static { opacity: .13; }
+.classic-art-static { opacity: 1; transition: opacity .25s ease; }
+.classic-art-stage:has(.classic-art-live[data-ready="true"]) .classic-art-static { opacity: 0; }
+.classic-art-live { opacity: 0; }
+.classic-art-live[data-ready="true"] { opacity: 1; }
+.classic-art-label { position: absolute; bottom: 5px; right: 12px; color: #9ac0d5; font: 10px/1.4 ui-monospace,monospace; letter-spacing: .14em; text-transform: uppercase; }
+.classic-backdrop[data-classic-scene="home"] .classic-art-label { display: none; }
 .classic-portfolio .classic-hero h1 { text-wrap: balance; text-shadow: 0 3px 30px rgba(0,0,0,.65); }
 .classic-portfolio .classic-hero h1 .gradient-text { text-shadow: none; }
 .classic-portfolio .architecture-card[aria-pressed="true"] { border-color: rgba(56,189,248,.65); }
 .classic-portfolio .classic-hero a { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; }
 @media (max-width: 640px) {
   .classic-portfolio .section-container { padding-inline: 1.125rem; }
-  .classic-art-stage { width: 115%; right: -38%; opacity: .38; }
-  .classic-backdrop[data-classic-scene="expertise"] .classic-art-stage, .classic-backdrop[data-classic-scene="projects"] .classic-art-stage, .classic-backdrop[data-classic-scene="contact"] .classic-art-stage { left: -38%; }
+  .classic-section-header { min-height: 0; padding: 0 0 226px; margin-bottom: 1.5rem; }
+  .classic-section-header .classic-backdrop { width: min(100%, 340px); height: 208px; inset: auto auto 0 50%; transform: translateX(-50%); }
+  .classic-art-label { font-size: 9px; }
   .classic-portfolio .classic-hero h1 { font-size: clamp(2.25rem, 10vw, 3.5rem); }
   .classic-portfolio .classic-hero a { width: min(100%, 17rem); }
 }
+
+@media (prefers-reduced-motion: reduce) { .classic-art-live { display: none; } .classic-art-static { opacity: 1 !important; } }

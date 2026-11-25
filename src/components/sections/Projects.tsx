@@ -81,7 +81,6 @@ export default function Projects() {
 
   return (
     <section id="projects" className="classic-section relative py-24 sm:py-32 overflow-hidden">
-      <ClassicBackdrop variant="projects" />
       {/* Background accent */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full opacity-[0.015] blur-[150px] bg-accent-secondary pointer-events-none" />
 
@@ -93,6 +92,7 @@ export default function Projects() {
           transition={{ duration: 0.5 }}
           className="classic-section-header"
         >
+          <ClassicBackdrop variant="projects" />
           <p className="section-label mb-4">Projects</p>
           <h2 className="section-title text-text-main">
             Featured work and engineering experiments.

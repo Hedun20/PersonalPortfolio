@@ -64,7 +64,6 @@ export default function Expertise() {
 
   return (
     <section id="expertise" className="classic-section relative py-24 sm:py-32">
-      <ClassicBackdrop variant="expertise" />
       {/* Background accent */}
       <div className="absolute bottom-1/4 left-0 w-[500px] h-[500px] rounded-full opacity-[0.02] blur-[120px] bg-accent-primary pointer-events-none" />
 
@@ -76,6 +75,7 @@ export default function Expertise() {
           transition={{ duration: 0.5 }}
           className="classic-section-header"
         >
+          <ClassicBackdrop variant="expertise" />
           <p className="section-label mb-4">Expertise</p>
           <h2 className="section-title text-text-main">
             Deep technical capabilities across the full stack.

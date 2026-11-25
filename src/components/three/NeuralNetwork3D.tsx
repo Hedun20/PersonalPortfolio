@@ -6,6 +6,7 @@ import * as THREE from 'three';
 interface NeuralNetwork3DProps {
   mouseX: number;
   mouseY: number;
+  onReady?: () => void;
 }
 
 interface NodeData {
@@ -48,9 +49,10 @@ function generateNodeData(): NodeData[] {
 
 const nodeData = generateNodeData();
 
-function NeuralNetwork({ mouseX, mouseY }: NeuralNetwork3DProps) {
+function NeuralNetwork({ mouseX, mouseY, onReady }: NeuralNetwork3DProps) {
   const pointsRef = useRef<THREE.Points>(null);
   const groupRef = useRef<THREE.Group>(null);
+  const frames = useRef(0);
 
   const positions = useMemo(() => {
     const arr = new Float32Array(nodeData.length * 3);
@@ -87,6 +89,7 @@ function NeuralNetwork({ mouseX, mouseY }: NeuralNetwork3DProps) {
   }, []);
 
   useFrame((_, delta) => {
+    if (frames.current < 2 && ++frames.current === 2) onReady?.();
     if (groupRef.current) {
       const dt = Math.min(delta, 0.05);
       groupRef.current.rotation.y += dt * 0.07;
@@ -106,8 +109,8 @@ function NeuralNetwork({ mouseX, mouseY }: NeuralNetwork3DProps) {
         frustumCulled={false}
       >
         <PointMaterial
-          color="#38BDF8"
-          size={0.055}
+          color="#79DFFF"
+          size={0.075}
           sizeAttenuation
           transparent
           opacity={0.85}
@@ -126,7 +129,7 @@ function NeuralNetwork({ mouseX, mouseY }: NeuralNetwork3DProps) {
         <lineBasicMaterial
           color="#38BDF8"
           transparent
-          opacity={0.17}
+          opacity={0.38}
           depthWrite={false}
         />
       </lineSegments>
@@ -134,7 +137,7 @@ function NeuralNetwork({ mouseX, mouseY }: NeuralNetwork3DProps) {
   );
 }
 
-export default function NeuralNetwork3D({ mouseX, mouseY }: NeuralNetwork3DProps) {
+export default function NeuralNetwork3D({ mouseX, mouseY, onReady }: NeuralNetwork3DProps) {
   return (
     <Canvas
       camera={{ position: [0, 0, 10], fov: 60 }}
@@ -147,7 +150,7 @@ export default function NeuralNetwork3D({ mouseX, mouseY }: NeuralNetwork3DProps
       gl={{ alpha: true, antialias: false }}
     >
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.3}>
-        <NeuralNetwork mouseX={mouseX} mouseY={mouseY} />
+        <NeuralNetwork mouseX={mouseX} mouseY={mouseY} onReady={onReady} />
       </Float>
     </Canvas>
   );

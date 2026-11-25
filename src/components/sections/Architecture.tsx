@@ -38,7 +38,6 @@ export default function Architecture() {
 
   return (
     <section id="architecture" className="classic-section relative py-24 sm:py-32 overflow-hidden">
-      <ClassicBackdrop variant="architecture" />
       {/* Background accent */}
       <div className="absolute top-1/3 right-0 w-[500px] h-[600px] rounded-full opacity-[0.015] blur-[120px] bg-accent-primary pointer-events-none" />
 
@@ -51,6 +50,7 @@ export default function Architecture() {
           transition={{ duration: 0.5 }}
           className="classic-section-header classic-section-header--compact"
         >
+          <ClassicBackdrop variant="architecture" />
           <p className="section-label mb-4">AI Architecture</p>
           <h2 className="section-title text-text-main">
             System architecture and data flow.

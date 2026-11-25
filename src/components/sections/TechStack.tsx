@@ -83,7 +83,6 @@ export default function TechStack() {
 
   return (
     <section id="techstack" className="classic-section relative py-24 sm:py-32 overflow-hidden">
-      <ClassicBackdrop variant="techstack" />
       <div ref={ref} className="section-container classic-content">
         {/* Section header */}
         <motion.div
@@ -92,6 +91,7 @@ export default function TechStack() {
           transition={{ duration: 0.5 }}
           className="classic-section-header"
         >
+          <ClassicBackdrop variant="techstack" />
           <p className="section-label mb-4">Technology Stack</p>
           <h2 className="section-title text-text-main">
             Technologies and tools.

@@ -40,7 +40,6 @@ export default function About() {
 
   return (
     <section id="about" className="classic-section relative py-24 sm:py-32 overflow-hidden">
-      <ClassicBackdrop variant="about" />
       {/* Background accent */}
       <div className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full opacity-[0.02] blur-[120px] bg-accent-secondary pointer-events-none" />
 
@@ -52,6 +51,7 @@ export default function About() {
           transition={{ duration: 0.5 }}
           className="classic-section-header"
         >
+          <ClassicBackdrop variant="about" />
           <p className="section-label mb-4">About</p>
           <h2 className="section-title text-text-main">
             Building reliable software, from interface to infrastructure.

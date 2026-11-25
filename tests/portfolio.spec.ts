@@ -103,3 +103,37 @@ for (const [width, height] of [[320,568],[390,844],[768,1024],[1366,768],[1440,9
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   });
 }
+
+for (const width of [320,390,768]) {
+  test(`campus mobile directory is a compact vertical list at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+    const directory = page.getByRole('navigation', { name: 'Engineering avenue facilities' });
+    const rows = directory.getByRole('button');
+    await expect(rows).toHaveCount(5);
+    const boxes = await rows.evaluateAll(elements => elements.map(el => { const r = el.getBoundingClientRect(); return { x:r.x, y:r.y, height:r.height, width:r.width }; }));
+    expect(boxes.every((box,i) => i===0 || (Math.abs(box.x-boxes[0].x)<1 && box.y>=boxes[i-1].y+boxes[i-1].height-1))).toBe(true);
+    expect(boxes.every(box => box.height>=44 && box.height<=64)).toBe(true);
+    await rows.first().click();
+    const detail = page.getByRole('button', { name:'Project details +' });
+    await expect(detail).toBeVisible();
+    await expect(page.locator('#campus-project-details')).toBeHidden();
+    await detail.click();
+    await expect(page.locator('#campus-project-details')).toBeVisible();
+    await page.getByRole('button', { name:'Hide project details −' }).click();
+    await expect(page.locator('#campus-project-details')).toBeHidden();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
+  });
+}
+
+test('classic artwork has a visible reserved area even with reduced motion', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/classic/');
+  const art = page.locator('#about .classic-art-static');
+  await expect(art).toBeVisible();
+  await expect(art).toHaveCSS('opacity','1');
+  const artBox = await art.boundingBox();
+  expect(artBox?.height).toBeGreaterThan(180);
+  const title = await page.locator('#about h2').boundingBox();
+  expect(artBox!.y).toBeGreaterThan(title!.y+title!.height);
+});

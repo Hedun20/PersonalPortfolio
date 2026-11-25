@@ -37,12 +37,10 @@ export default function Hero() {
       onMouseMove={reduceMotion ? undefined : handleMouseMove}
     >
       {/* Three.js Neural Network Background */}
-      <ClassicBackdrop variant="home">
-        <NeuralNetwork3D mouseX={mousePos.x} mouseY={mousePos.y} />
-      </ClassicBackdrop>
+      <ClassicBackdrop variant="home" renderLive={onReady => <NeuralNetwork3D mouseX={mousePos.x} mouseY={mousePos.y} onReady={onReady} />} />
 
       {/* Atmospheric overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/20 via-bg-primary/10 to-bg-primary z-[1] pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/10 via-transparent to-bg-primary/80 z-[1] pointer-events-none" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-[0.08] blur-[120px] bg-accent-primary pointer-events-none" />
 
       {/* Grid pattern overlay */}

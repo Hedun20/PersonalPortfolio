@@ -1,5 +1,6 @@
-import { Component, useRef, type ReactNode } from 'react';
+import { Component, useRef, useState, type ReactNode } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { Line } from '@react-three/drei';
 import { useInView, useReducedMotion } from 'framer-motion';
 import type { Group } from 'three';
 
@@ -7,6 +8,7 @@ type Variant = 'home' | 'about' | 'expertise' | 'architecture' | 'projects' | 't
 type Vec = [number, number, number];
 type Segment = [Vec, Vec];
 const TAU = Math.PI * 2;
+const labels: Record<Variant, string> = { home: 'Neural network', about: 'Digital DNA', expertise: 'Modular systems', architecture: 'System layers', projects: 'Connected ecosystem', techstack: 'Technology orbit', contact: 'Signal array' };
 const colors: Record<Variant, string> = { home: '#38bdf8', about: '#60a5fa', expertise: '#38bdf8', architecture: '#818cf8', projects: '#34d399', techstack: '#a78bfa', contact: '#67e8f9' };
 
 function ring(radius: number, tilt = 0, height = 0): Segment[] {
@@ -44,32 +46,49 @@ function geometry(variant: Variant): Segment[] {
   return [.55,1.1,1.65,2.2,2.75].flatMap(r=>ring(r,.7)).concat([[[0,-.4,0],[0,.4,0]]]);
 }
 const shapes = Object.fromEntries(Object.keys(colors).map(key => [key,geometry(key as Variant)])) as Record<Variant, Segment[]>;
+const vertices = Object.fromEntries(Object.keys(shapes).map(key => [key, shapes[key as Variant].flat()])) as Record<Variant, Vec[]>;
 const buffers = Object.fromEntries(Object.keys(shapes).map(key => [key,new Float32Array(shapes[key as Variant].flat(2))])) as Record<Variant, Float32Array>;
 
 function StaticArt({ variant }: { variant: Variant }) {
-  const project = ([x,y,z]: Vec) => [160 + 39*(x + z*.45), 160 - 39*(y - z*.34)];
+  const project = ([x,y,z]: Vec) => [160 + 42*(x + z*.45), 160 - 42*(y - z*.34)];
+  const segments = shapes[variant].map(([a,b])=>{const [x1,y1]=project(a);const [x2,y2]=project(b);return {x1,y1,x2,y2};});
+  const filterId = `classic-glow-${variant}`;
   return <svg className="classic-art-static" viewBox="0 0 320 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <g fill="none" stroke={colors[variant]} strokeWidth=".8">
-      {shapes[variant].map(([a,b],i)=>{const [x1,y1]=project(a);const [x2,y2]=project(b);return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}/>;})}
+    <defs><filter id={filterId} x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+    <g fill="none" stroke={colors[variant]} strokeWidth="5" opacity=".6" filter={`url(#${filterId})`}>
+      {segments.map((segment,i)=><line key={i} {...segment}/>)}
+    </g>
+    <g fill="none" stroke={colors[variant]} strokeWidth="1.7" opacity=".95" strokeLinecap="round">
+      {segments.map((segment,i)=><line key={i} {...segment}/>)}
+    </g>
+    <g fill="#d6f4ff" opacity=".85">
+      {segments.filter((_,i)=>i%4===0).map(({x1,y1},i)=><circle key={i} cx={x1} cy={y1} r="1.5"/>)}
     </g>
   </svg>;
+}
+function ArtReady({ onReady }: { onReady: () => void }) {
+  const frames = useRef(0);
+  useFrame(() => { if (frames.current < 2 && ++frames.current === 2) onReady(); });
+  return null;
 }
 function AnimatedArt({ variant }: { variant: Variant }) {
   const group = useRef<Group>(null);
   useFrame(({ clock },delta) => {
     if (!group.current) return;
-    group.current.rotation.y += Math.min(delta,.05)*.15;
+    group.current.rotation.y += Math.min(delta,.05)*.28;
     group.current.rotation.x = .32 + Math.sin(clock.elapsedTime*.35)*.12;
     group.current.position.y = Math.sin(clock.elapsedTime*.65)*.13;
   });
   return <group ref={group} rotation={[.32,.55,0]}>
-    <lineSegments>
-      <bufferGeometry><bufferAttribute attach="attributes-position" args={[buffers[variant],3]} /></bufferGeometry>
-      <lineBasicMaterial color={colors[variant]} transparent opacity={.72} depthWrite={false}/>
-    </lineSegments>
+    <Line points={vertices[variant]} segments color={colors[variant]} lineWidth={5} transparent opacity={.17} depthWrite={false} />
+    <Line points={vertices[variant]} segments color={colors[variant]} lineWidth={2.2} transparent opacity={.98} depthWrite={false} />
+    <mesh rotation={[.3,.5,.2]}>
+      <icosahedronGeometry args={[.44,1]} />
+      <meshBasicMaterial color={colors[variant]} wireframe transparent opacity={.75} />
+    </mesh>
     <points>
       <bufferGeometry><bufferAttribute attach="attributes-position" args={[buffers[variant],3]} /></bufferGeometry>
-      <pointsMaterial color={colors[variant]} size={.032} transparent opacity={.76} depthWrite={false}/>
+      <pointsMaterial color={colors[variant]} size={.065} transparent opacity={.95} depthWrite={false}/>
     </points>
   </group>;
 }
@@ -78,20 +97,26 @@ class ArtBoundary extends Component<{ children: ReactNode }, { failed: boolean }
   static getDerivedStateFromError() { return { failed: true }; }
   render() { return this.state.failed ? null : this.props.children; }
 }
-export default function ClassicBackdrop({ variant, children }: { variant: Variant; children?: ReactNode }) {
+function LiveArt({ variant, renderLive }: { variant: Variant; renderLive?: (onReady: () => void) => ReactNode }) {
+  const [ready, setReady] = useState(false);
+  const markReady = () => setReady(true);
+  return <ArtBoundary>
+    <div className="classic-art-live" data-ready={ready}>
+      {renderLive ? renderLive(markReady) : <Canvas camera={{ position:[0,0,9.1],fov:43 }} dpr={[1,1.5]} gl={{alpha:true,antialias:true}} fallback={null}>
+        <AnimatedArt variant={variant}/><ArtReady onReady={markReady}/>
+      </Canvas>}
+    </div>
+  </ArtBoundary>;
+}
+export default function ClassicBackdrop({ variant, renderLive }: { variant: Variant; renderLive?: (onReady: () => void) => ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const visible = useInView(ref, { amount: .02 });
   const reduced = useReducedMotion();
   return <div ref={ref} className="classic-backdrop" data-classic-scene={variant} aria-hidden="true">
     <div className="classic-art-stage">
       <StaticArt variant={variant} />
-      {visible && reduced === false && <ArtBoundary>
-        <div className="classic-art-live">
-          {children ?? <Canvas camera={{ position:[0,0,8.8],fov:48 }} dpr={[1,1.25]} gl={{alpha:true,antialias:false}} fallback={null}>
-            <AnimatedArt variant={variant}/>
-          </Canvas>}
-        </div>
-      </ArtBoundary>}
+      {visible && !reduced && <LiveArt variant={variant} renderLive={renderLive}/>}
+      <span className="classic-art-label">{labels[variant]}</span>
     </div>
   </div>;
 }
