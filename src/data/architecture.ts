@@ -27,13 +27,13 @@ export const architectureNodes: ArchitectureNode[] = [
   {
     id: 'agents',
     label: 'Intelligent Agents',
-    description: 'Autonomous agents for document processing, data analysis, task execution, and workflow automation.',
+    description: 'Bounded AI capabilities for document analysis and workflow proposals; the control plane validates permissions and human confirmation for critical actions.',
     layer: 3,
   },
   {
     id: 'llm-runtime',
     label: 'Local LLM Runtime',
-    description: 'Ollama / LMStudio runtime serving quantized models with GPU acceleration and memory optimization.',
+    description: 'Replaceable local model runtimes serving quantized models through a provider abstraction, with hardware-aware configuration.',
     layer: 4,
   },
   {
@@ -51,13 +51,13 @@ export const architectureNodes: ArchitectureNode[] = [
   {
     id: 'database',
     label: 'Database & Storage',
-    description: 'PostgreSQL relational storage, MongoDB document store, file system, and vector index management.',
+    description: 'PostgreSQL for authoritative state, local file storage, and vector index management.',
     layer: 7,
   },
   {
     id: 'security',
     label: 'Security & Permissions',
-    description: 'Role-based access control, data encryption, audit logging, and permission-aware workflow routing.',
+    description: 'Role-based access control, workspace isolation, audit logging and permission-aware workflow routing.',
     layer: 8,
   },
 ];

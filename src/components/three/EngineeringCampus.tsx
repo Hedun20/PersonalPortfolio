@@ -932,8 +932,8 @@ export default function EngineeringCampus() {
   const [intro,setIntro]=useState(false);
   const onUnavailable=useCallback(()=>{setReady(false);setShow3D(false);setIntro(false);},[]);
   const onSceneError=useCallback(()=>{setSceneFailed(true);onUnavailable();},[onUnavailable]);
-  function enable3D(){setSceneFailed(false);setSlowStart(false);setReady(false);setShow3D(true);}
   const [demoOpen,setDemoOpen]=useState(false);
+  const [mobileDetails,setMobileDetails]=useState(false);
   const [motion, setMotion] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -953,8 +953,8 @@ export default function EngineeringCampus() {
   const activeIndex=active?zones.indexOf(active):-1;
   const mapRef=useRef<HTMLButtonElement>(null);
   const detailTitle=useRef<HTMLHeadingElement>(null);
-  function goTo(id:ZoneId){setIntro(false);setDemoOpen(false);setInterior(false);setSelected(id);setTopic(1);setReset(value=>value+1);}
-  function returnToMap(){setIntro(false);setDemoOpen(false);setInterior(false);setSelected(null);setReset(value=>value+1);mapRef.current?.focus({preventScroll:true});}
+  function goTo(id:ZoneId){setMobileDetails(false);setIntro(false);setDemoOpen(false);setInterior(false);setSelected(id);setTopic(1);setReset(value=>value+1);}
+  function returnToMap(){setMobileDetails(false);setIntro(false);setDemoOpen(false);setInterior(false);setSelected(null);setReset(value=>value+1);mapRef.current?.focus({preventScroll:true});}
   useEffect(()=>{if(selected)detailTitle.current?.focus({preventScroll:true});},[selected]);
   function playIntro(){if(!motion||!show3D||!ready)return;returnToMap();setIntro(true);}
   function stopIntro(){setIntro(false);}
@@ -967,7 +967,7 @@ export default function EngineeringCampus() {
     <div className="campus-stage">
       <div className="campus-world-canvas">{show3D?<SceneBoundary fallback={fallback} onError={onSceneError}><Canvas camera={{ position: [0,27,27.5], fov: 44, near: 0.1, far: 240 }} dpr={[1, 1.25]} shadows gl={{ antialias: true }} fallback={fallback}>
         <CampusMaterialProvider>{interior&&active?<FacilityInterior key={active.id} zone={active} topic={topic} onTopic={selectTopic} motion={motion}/>:<CampusScene selected={selected} topic={topic} onSelect={goTo} onTopic={selectTopic} motion={motion} reset={reset} intro={intro&&motion} onIntroEnd={stopIntro}/>}</CampusMaterialProvider><SceneReady onReady={onReady}/>
-      </Canvas></SceneBoundary>:<div className="campus-fallback"><p>{sceneFailed?'The 3D scene could not start. Enable 3D to retry, or explore the projects below.':'Explore the projects directly in the directory, or enable the 3D city.'}</p></div>}</div>
+      </Canvas></SceneBoundary>:<div className="campus-fallback"><p>{sceneFailed?'The 3D scene could not start. You can explore all projects in the directory below.':'Explore all projects directly in the directory below.'}</p></div>}</div>
       <div className="campus-topfade" aria-hidden="true" />
       {intro&&motion&&<div className="campus-cinematic-overlay"><div><p>TYMUR ABBASOV / SOFTWARE &amp; AI ENGINEERING</p><h3>Enter the system.</h3><span>An interactive engineering portfolio. Five facilities, one connected world.</span></div><button type="button" onClick={()=>{stopIntro();requestAnimationFrame(()=>mapRef.current?.focus({preventScroll:true}));}}>Skip intro →</button></div>}
       <header className="campus-header">
@@ -983,18 +983,23 @@ export default function EngineeringCampus() {
         <div className="campus-controls" aria-label="Scene settings">
           <button type="button" ref={mapRef} onClick={returnToMap}>⌖ City overview</button>
           {active&&<button type="button" className="campus-enter-button" onClick={toggleInterior}>{interior?'Return to exterior':'Enter facility ↗'}</button>}
-          {show3D?<><button type="button" onClick={playIntro} disabled={!motion||!ready}>Play intro</button><button type="button" onClick={onUnavailable}>Disable 3D</button></>:<button type="button" onClick={enable3D}>Enable 3D</button>}
-          <button type="button" onClick={() => {setIntro(false);setMotion(value => !value);}} aria-pressed={motion}>Motion {motion ? 'on' : 'off'}</button>
+          {show3D&&motion&&ready&&<button type="button" onClick={playIntro}>Play intro</button>}
         </div>
       </header>
-      {show3D&&!ready&&<div className={`campus-loading${slowStart?' campus-loading-slow':''}`}><div className="campus-loading-content"><div className="campus-loading-emblem" aria-hidden="true"><i/><i/><i/></div><p>TYMUR ABBASOV / INTERACTIVE PORTFOLIO</p><h3>Initializing the energy network.</h3><div className="campus-loading-track" aria-hidden="true"><span/></div><span role="status">{slowStart?'The renderer is taking longer than expected. You can continue exploring or switch off 3D.':'Preparing 3D geometry, materials and energy channels…'}</span><button type="button" onClick={onUnavailable}>Explore without 3D →</button></div></div>}
+      {show3D&&!ready&&<div className={`campus-loading${slowStart?' campus-loading-slow':''}`}><div className="campus-loading-content"><div className="campus-loading-emblem" aria-hidden="true"><i/><i/><i/></div><p>TYMUR ABBASOV / INTERACTIVE PORTFOLIO</p><h3>Initializing the energy network.</h3><div className="campus-loading-track" aria-hidden="true"><span/></div><span role="status">{slowStart?'The renderer is taking longer than expected. You can continue using the project directory.':'Preparing 3D geometry, materials and energy channels…'}</span><button type="button" onClick={onUnavailable}>Explore without 3D →</button></div></div>}
       <div className="campus-hint">{interior?'Select a workstation · Drag to orbit · Scroll to zoom':active?'Choose a light marker · Enter facility to explore inside':'Drag to orbit · Right-drag to move · Scroll to zoom · Click a building'}<span className="campus-key-hint"> · Focus scene: WASD / arrows to move</span></div>
     </div>
+    <nav className="campus-directory" aria-label="Engineering avenue facilities">
+      <div className="campus-directory-title">DISTRICT DIRECTORY <span>05 FACILITIES</span></div>
+      <div className="campus-stops">{zones.map(zone => <button type="button" key={zone.id} aria-pressed={selected === zone.id} className={`campus-zone ${selected === zone.id ? 'is-selected' : ''}`} onClick={() => goTo(zone.id)} style={{ '--zone-color': zone.color } as CSSProperties}><span className="campus-number">{zone.label}</span><span>{zone.name}</span><span className="campus-arrow" aria-hidden="true">↗</span></button>)}</div>
+    </nav>
     {active&&dossier&&activeTopic&&<aside className="campus-spatial-info" style={{'--zone-color':active.color} as CSSProperties} aria-label={`${active.name} information`}>
       <div className="campus-spatial-top"><span>FACILITY / {active.label}</span><button type="button" onClick={returnToMap}>← City overview</button></div>
       <p className="campus-spatial-eyebrow">{dossier.subtitle}</p>
       <h3 ref={detailTitle} tabIndex={-1}>{active.name}</h3>
       <p className="campus-spatial-intro">{active.description}</p>
+      <button className="campus-mobile-details-toggle" type="button" aria-expanded={mobileDetails} aria-controls="campus-project-details" onClick={()=>setMobileDetails(value=>!value)}>{mobileDetails?'Hide project details −':'Project details +'}</button>
+      <div className="campus-project-details" id="campus-project-details" data-expanded={mobileDetails}>
       <button className="campus-interior-link" type="button" onClick={toggleInterior}>{interior?'← Back to the exterior':'Enter facility / explore the interior ↗'}</button>
       <div className="campus-spatial-topics" role="group" aria-label="Explore building systems">{topics[active.id].map((item,i)=><button key={item.name} type="button" aria-pressed={topic===i} onClick={()=>selectTopic(i)}><span>{String(i+1).padStart(2,'0')}</span>{item.name}</button>)}</div>
       <div className="campus-spatial-story" key={`${active.id}-${topic}`} aria-live="polite">
@@ -1006,11 +1011,9 @@ export default function EngineeringCampus() {
       <p className="campus-demo-note">Optional step-by-step illustration with sample data. No live project is launched.</p>
       {demoOpen&&<CampusProjectDemo key={active.id} id={active.id} motion={motion} onStep={setTopic}/>}
       <a className="campus-spatial-link" href={`./classic/${active.section}`}>{dossier.route} <span aria-hidden="true">↗</span></a>
+      </div>
       <div className="campus-spatial-nav"><button type="button" disabled={activeIndex<=0} onClick={()=>goTo(zones[activeIndex-1].id)}>← Previous</button><span>{active.label} / 05</span><button type="button" disabled={activeIndex>=zones.length-1} onClick={()=>goTo(zones[activeIndex+1].id)}>Next →</button></div>
     </aside>}
-    <nav className="campus-directory" aria-label="Engineering avenue facilities">
-      <div className="campus-directory-title">DISTRICT DIRECTORY <span>05 FACILITIES</span></div>
-      <div className="campus-stops">{zones.map(zone => <button type="button" key={zone.id} aria-pressed={selected === zone.id} className={`campus-zone ${selected === zone.id ? 'is-selected' : ''}`} onClick={() => goTo(zone.id)} style={{ '--zone-color': zone.color } as CSSProperties}><span className="campus-number">{zone.label}</span><span>{zone.name}</span><span className="campus-arrow" aria-hidden="true">↗</span></button>)}</div>
-    </nav>
+
   </section>;
 }

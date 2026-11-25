@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import './classic.css';
 import Navbar from './components/layout/Navbar';
 import Hero from './components/sections/Hero';
 import About from './components/sections/About';
@@ -12,7 +13,7 @@ function App() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={scrollRef} className="min-h-screen bg-bg-primary text-text-main">
+    <div ref={scrollRef} className="classic-portfolio min-h-screen bg-bg-primary text-text-main">
       <Navbar />
       <main>
         <section id="home" aria-label="Hero">

@@ -10,7 +10,7 @@ export const expertiseData: ExpertiseItem[] = [
     title: 'Artificial Intelligence',
     description:
       'Local LLM deployment, RAG pipelines, OCR, embeddings, and intelligent agent orchestration for private AI systems.',
-    technologies: ['Qwen', 'Gemma', 'RAG', 'OCR', 'LangChain'],
+    technologies: ['Qwen', 'Gemma', 'RAG', 'OCR', 'Embeddings'],
     icon: 'Brain',
   },
   {
@@ -23,8 +23,8 @@ export const expertiseData: ExpertiseItem[] = [
   {
     title: 'Software Architecture',
     description:
-      'Scalable system design, modular component architecture, microservice patterns, and enterprise-grade solutions.',
-    technologies: ['System Design', 'Microservices', 'Domain-Driven'],
+      'Modular system design, API boundaries, data modeling and maintainable application architecture.',
+    technologies: ['System Design', 'API Design', 'Data Modeling'],
     icon: 'LayoutGrid',
   },
   {
@@ -37,14 +37,14 @@ export const expertiseData: ExpertiseItem[] = [
   {
     title: 'Infrastructure & DevOps',
     description:
-      'Containerized deployments, CI/CD pipelines, Linux server management, and reliable cloud-native infrastructure.',
+      'Containerized deployments, CI/CD pipelines, Linux server management, and reliable application infrastructure.',
     technologies: ['Docker', 'CI/CD', 'Nginx', 'Linux'],
     icon: 'Server',
   },
   {
     title: 'Automation & AI Agents',
     description:
-      'Intelligent automation systems connecting models, tools, and APIs into self-directed engineering workflows.',
+      'Intelligent automation systems connecting models, tools, and APIs into reviewable engineering workflows.',
     technologies: ['AI Agents', 'Workflows', 'API Integration'],
     icon: 'Bot',
   },

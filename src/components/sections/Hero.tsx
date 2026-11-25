@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, easeOut, useReducedMotion } from 'framer-motion';
+import ClassicBackdrop from '../three/ClassicBackdrop';
 import NeuralNetwork3D from '../three/NeuralNetwork3D';
 
 const containerVariants = {
@@ -32,21 +33,19 @@ export default function Hero() {
 
   return (
     <div
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="classic-hero relative min-h-screen flex items-center justify-center overflow-hidden isolate"
       onMouseMove={reduceMotion ? undefined : handleMouseMove}
     >
       {/* Three.js Neural Network Background */}
-      <div className="absolute inset-0 z-0">
-        {!reduceMotion && <NeuralNetwork3D mouseX={mousePos.x} mouseY={mousePos.y} />}
-      </div>
+      <ClassicBackdrop variant="home" renderLive={onReady => <NeuralNetwork3D mouseX={mousePos.x} mouseY={mousePos.y} onReady={onReady} />} />
 
       {/* Atmospheric overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/50 via-transparent to-bg-primary z-[1]" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-[0.03] blur-[120px] bg-accent-primary pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/10 via-transparent to-bg-primary/80 z-[1] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-[0.08] blur-[120px] bg-accent-primary pointer-events-none" />
 
       {/* Grid pattern overlay */}
       <div
-        className="absolute inset-0 z-[1]"
+        className="absolute inset-0 z-[1] pointer-events-none"
         style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, rgba(56,189,248,0.03) 1px, transparent 0)`,
           backgroundSize: '40px 40px',
@@ -57,7 +56,7 @@ export default function Hero() {
       <div className="relative z-10 text-center px-6 py-28 max-w-5xl mx-auto">
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <motion.p variants={itemVariants} className="section-label mb-6 tracking-wider">
-            INTELLIGENCE ARCHITECT
+            TYMUR ABBASOV / FULL-STACK &amp; AI ENGINEERING
           </motion.p>
 
           <motion.h1
@@ -73,21 +72,21 @@ export default function Hero() {
             variants={itemVariants}
             className="mt-8 text-lg sm:text-xl md:text-2xl text-text-secondary max-w-2xl mx-auto leading-relaxed"
           >
-            Building intelligent systems, scalable software, and private AI infrastructure.
+            Full-stack engineering, scalable business applications, and private AI infrastructure.
           </motion.p>
 
           <motion.div variants={itemVariants} className="mt-12 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
             <a
-              href="#projects"
+              href="../"
               className="group relative px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide bg-accent-primary text-bg-primary font-semibold hover:bg-sky-300 transition-all duration-300 shadow-lg shadow-accent-primary/20"
             >
-              Explore My Work
+              Explore T3 Campus
             </a>
             <a
-              href="../"
+              href="#projects"
               className="px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide border border-border-accent/50 text-text-main hover:border-accent-primary/60 hover:bg-white/[0.03] transition-all duration-300"
             >
-              Explore 3D campus
+              Explore My Work
             </a>
             <a
               href="#contact"
