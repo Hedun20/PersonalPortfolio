@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { Html } from '@react-three/drei';
 
 type Vector = [number, number, number];
 type Part = { position: Vector; scale: Vector; rotation: number; color: string };
@@ -39,7 +40,7 @@ export function NeonStreetlights() {
     const bodies: Part[] = [], emitters: Part[] = [];
     for (let i = 0; i < 17; i++) {
       const a = -1.48 + i * 2.96 / 16;
-      for (const [radius, height] of [[8.25, 1.65], [13.0, 1.95], [24.8, 2.75]]) {
+      for (const [radius, height] of [[8.25, 1.65], [13.0, 1.95], [25.55, 2.35], [37.3, 2.55], [48.3, 2.75]]) {
         const rot = -a;
         const add = (target: Part[], r: number, y: number, scale: Vector, color: string) => target.push({ position: point(a, r, y), scale, rotation: rot, color });
         add(bodies, radius, .13, [.23,.27,.28], '#456070');
@@ -140,4 +141,71 @@ function ForegroundRain({motion,count,focused}:{motion:boolean;count:number;focu
   return <instancedMesh key={count} ref={ref} args={[undefined,undefined,count]} frustumCulled={false} raycast={()=>null}>
     <boxGeometry args={[1,1,1]}/><meshBasicMaterial toneMapped={false} transparent opacity={.67} depthWrite={false}/>
   </instancedMesh>;
+}
+
+// Original, lightweight street furniture: two small shops between the first
+// outer sidewalk and the skyline, with shared geometry/material batches.
+export function CampusStreetLife({ motion }: { motion: boolean }) {
+  const { bodies, emitters } = useMemo(() => {
+    const bodies: Part[] = [], emitters: Part[] = [];
+    for (const [angle, accent] of [[-.84, '#ffd3a0'], [.84, '#9bafff']] as const) {
+      const add = (target: Part[], x: number, y: number, z: number, scale: Vector, color: string) => {
+        const center = point(angle, 27.15, y);
+        target.push({ position: [center[0]+x*Math.cos(angle)-z*Math.sin(angle), y, center[2]+x*Math.sin(angle)+z*Math.cos(angle)], scale, rotation: -angle, color });
+      };
+      add(bodies,0,.02,0,[2.3,.14,1.02],'#384b56');
+      add(bodies,0,.64,-.28,[2.05,1.22,.48],'#263745');
+      add(bodies,0,1.36,0,[2.28,.16,1.05],'#4b626f');
+      add(bodies,0,.44,.32,[1.92,.64,.35],'#4a5b65');
+      add(bodies,0,.79,.34,[2.0,.10,.47],'#8799a2');
+      for(const side of [-1,1]){
+        add(bodies,side, .77,.38,[.09,1.15,.09],'#768b99');
+        add(emitters,side, .85,.43,[.04,.85,.04],accent);
+        add(bodies,side*.65,.13,.81,[.26,.23,.26],'#344651');
+        add(bodies,side*.65,.28,.81,[.33,.08,.33],'#607782');
+      }
+      add(emitters,0,1.27,.54,[1.85,.07,.045],accent);
+      add(emitters,0,1.10,.005,[1.62,.31,.045],'#e7bd86');
+      for(let i=0;i<5;i++)add(bodies,-.65+i*.32,.98,.04,[.12,.21,.12],i%2?'#8b6a52':'#5a8191');
+      // Low bollards near the shop frontage, away from the road.
+      for(const x of [-1.25,1.25]){
+        add(bodies,x,.22,.62,[.09,.47,.09],'#526d7c');
+        add(emitters,x,.45,.62,[.11,.065,.11],accent);
+      }
+    }
+    return { bodies, emitters };
+  }, []);
+  return <group>
+    <Batch parts={bodies}/><Batch parts={emitters} lit/>
+    {[-.84,.84].map((angle,i)=><Html key={angle} position={point(angle,27.05,1.65)} center distanceFactor={18} zIndexRange={[2,0]} style={{pointerEvents:'none',whiteSpace:'nowrap'}}>
+      <span className="campus-street-sign">{i===0?'NEON CAFÉ':'ORBIT BAR'}</span>
+    </Html>)}
+    <PlazaFountain motion={motion}/>
+  </group>;
+}
+
+// Shallow illuminated water and two animated ripples, no reflection pass,
+// fluid simulation or additional shadow-casting light.
+function PlazaFountain({ motion }: { motion: boolean }) {
+  const rings = useRef<THREE.Group>(null);
+  const elapsed = useRef(0);
+  useFrame((_,dt)=>{
+    const group=rings.current;
+    if(!group||!motion)return;
+    elapsed.current=(elapsed.current+Math.min(dt,.05)*.26)%1;
+    group.children.forEach((child,i)=>{
+      const phase=(elapsed.current+i*.5)%1;
+      child.scale.setScalar(.25+phase*.75);
+    });
+  });
+  return <group position={[-4.65,0,5.3]}>
+    <mesh position={[0,.065,0]}><cylinderGeometry args={[1.06,1.12,.20,32]}/><meshStandardMaterial color="#3b5666" metalness={.52} roughness={.38}/></mesh>
+    <mesh position={[0,.18,0]}><cylinderGeometry args={[.91,.91,.035,32]}/><meshPhysicalMaterial color="#23718a" metalness={.28} roughness={.19} clearcoat={1}/></mesh>
+    <mesh position={[0,.20,0]} rotation={[-Math.PI/2,0,0]}><torusGeometry args={[.99,.032,6,40]}/><meshBasicMaterial color="#73e3ff" toneMapped={false}/></mesh>
+    <group ref={rings} position={[0,.209,0]}>
+      {[.55,.85].map(scale=><mesh key={scale} scale={scale} rotation={[-Math.PI/2,0,0]}><torusGeometry args={[.79,.012,5,32]}/><meshBasicMaterial color="#b5efff" transparent opacity={.55} depthWrite={false}/></mesh>)}
+    </group>
+    <mesh position={[0,.32,0]}><cylinderGeometry args={[.09,.13,.28,12]}/><meshStandardMaterial color="#6b8794" metalness={.7} roughness={.3}/></mesh>
+    <mesh position={[0,.57,0]}><cylinderGeometry args={[.021,.035,.24,8]}/><meshBasicMaterial color="#a7eaff" transparent opacity={.75}/></mesh>
+  </group>;
 }

@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, Html, Lightformer, OrbitControls, RoundedBox } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import * as THREE from 'three';
-import { DataRain, NeonStreetlights } from './CampusAtmosphere';
+import { CampusStreetLife, DataRain, NeonStreetlights } from './CampusAtmosphere';
 import { ArchitecturalFinish, CampusMaterialProvider, ContactFootprint, PolishedPlaza } from './CampusMaterials';
 import { ArchitecturalSlab, FacilityArchitecture } from './CampusArchitecture';
 import { ArchitecturalSky, CityLighting, PavementLightPools } from './CampusVisuals';
@@ -580,25 +580,34 @@ function ElevatedDistrict({ motion }: { motion:boolean }) {
   </group>;
 }
 
-function TransitVehicle({ airborne, phase, color, motion, direction = 1 }: { airborne: boolean; phase: number; color: string; motion: boolean; direction?: number }) {
+function TransitVehicle({ airborne, phase, color, motion, direction = 1, perimeterRadius }: { airborne: boolean; phase: number; color: string; motion: boolean; direction?: number; perimeterRadius?: number }) {
   const vehicle=useRef<THREE.Group>(null), elapsed=useRef(0);
   useFrame((_,dt)=>{
     if(!vehicle.current)return;
     if(motion)elapsed.current+=Math.min(dt,.1);
-    const u=(phase+elapsed.current*(airborne?.035:.055))%1;
+    const u=(phase+elapsed.current*(perimeterRadius? .55/perimeterRadius : airborne?.035:.055))%1;
     // Extended open route, not a loop around the visible map. Hide outside the portals.
-    const limit=ARC_END+.32;
+    const routeEnd=perimeterRadius?1.68:ARC_END;
+    const limit=routeEnd+.32;
     const angle=direction*(-limit+u*limit*2);
-    const radius=airborne?ROAD_RADIUS-2.7:ROAD_RADIUS+direction*.61;
-    vehicle.current.position.set(...arcPoint(angle,radius,airborne?4.9:.27));
+    const radius=perimeterRadius?perimeterRadius+direction*.72:airborne?ROAD_RADIUS-2.7:ROAD_RADIUS+direction*.61;
+    vehicle.current.position.set(...arcPoint(angle,radius,perimeterRadius?.14:airborne?4.9:.27));
     vehicle.current.rotation.y=Math.atan2(direction*Math.cos(angle),direction*Math.sin(angle));
     const edge=Math.abs(angle);
-    const scale=1-THREE.MathUtils.smoothstep(edge,ARC_END-.025,ARC_END+.17);
+    const scale=1-THREE.MathUtils.smoothstep(edge,routeEnd-.025,routeEnd+.17);
     vehicle.current.scale.setScalar(Math.max(.001,scale));
-    vehicle.current.visible=edge<ARC_END+.17;
+    vehicle.current.visible=edge<routeEnd+.17;
   });
   return <group ref={vehicle}>
-    {airborne?<group>
+    {perimeterRadius?<group>
+      <mesh position={[0,.06,0]} scale={[.34,.13,.64]}><sphereGeometry args={[1,12,8]}/><meshStandardMaterial color="#30485c" metalness={.65} roughness={.29}/></mesh>
+      <mesh position={[0,.19,-.035]} scale={[.24,.16,.34]}><sphereGeometry args={[1,12,8]}/><meshStandardMaterial color="#698c9e" metalness={.52} roughness={.23}/></mesh>
+      {[-1,1].map(side=><group key={side}>
+        <Block position={[side*.28,.005,0]} size={[.065,.07,.75]} color={color} light/>
+        <Block position={[side*.21,.10,.48]} size={[.13,.055,.07]} color="#d9f7ff" light/>
+        <Block position={[side*.23,.085,-.48]} size={[.12,.045,.055]} color="#ff806e" light/>
+      </group>)}
+    </group>:airborne?<group>
       <mesh scale={[.39,.105,.65]}><sphereGeometry args={[1,20,12]}/><meshStandardMaterial color="#354c60" metalness={.65} roughness={.27}/></mesh>
       <mesh position={[0,.09,.08]} scale={[.19,.10,.29]}><sphereGeometry args={[1,16,10]}/><meshStandardMaterial color="#789bad" metalness={.65} roughness={.19}/></mesh>
       {[-1,1].map(side=><group key={side}><Block position={[side*.38,-.015,-.09]} size={[.26,.07,.67]} color="#3e5667"/><Block position={[side*.5,-.02,-.12]} size={[.036,.042,.56]} color={color} light/></group>)}
@@ -614,8 +623,8 @@ function TransitVehicle({ airborne, phase, color, motion, direction = 1 }: { air
       {[-1,1].map(side=><group key={side}><Rail from={[side*.112,.1,-.27]} to={[side*.118,.13,.29]} width={.025} color={color} light/><Block position={[side*.1,.12,-.08]} size={[.035,.055,.19]} color="#7794a5"/></group>)}
       <Block position={[0,.13,.42]} size={[.11,.045,.055]} color="#c1f4ff" light/>
     </group>}
-    <Block position={[0,.025,airborne?-.64:-.45]} size={[airborne?.29:.105,.045,.09]} color={color} light/>
-    {motion && Array.from({length:5},(_,i)=><mesh key={i} position={[0,.02,-.68-i*.25]}><boxGeometry args={[.045-i*.005,.024,.23]}/><meshBasicMaterial color={color} transparent opacity={.8-i*.13} toneMapped={false} depthWrite={false}/></mesh>)}
+    <Block position={[0,.025,perimeterRadius?-.60:airborne?-.64:-.45]} size={[airborne?.29:.105,.045,.09]} color={color} light/>
+    {motion && !perimeterRadius && Array.from({length:5},(_,i)=><mesh key={i} position={[0,.02,-.68-i*.25]}><boxGeometry args={[.045-i*.005,.024,.23]}/><meshBasicMaterial color={color} transparent opacity={.8-i*.13} toneMapped={false} depthWrite={false}/></mesh>)}
   </group>;
 }
 
@@ -627,6 +636,10 @@ function AirRoutes({ motion }: { motion: boolean }) {
     <TransitVehicle airborne={false} phase={.08} color="#76eaff" motion={motion}/>
     <TransitVehicle airborne={false} phase={.45} color="#ffb95d" motion={motion} direction={-1}/>
     <TransitVehicle airborne={false} phase={.79} color="#65e9d6" motion={motion}/>
+    <TransitVehicle airborne={false} perimeterRadius={24} phase={.22} color="#72d8ff" motion={motion}/>
+    <TransitVehicle airborne={false} perimeterRadius={24} phase={.64} color="#e9b77f" motion={motion} direction={-1}/>
+    <TransitVehicle airborne={false} perimeterRadius={35.7} phase={.35} color="#b9a3ff" motion={motion}/>
+    <TransitVehicle airborne={false} perimeterRadius={46.7} phase={.61} color="#77e6c5" motion={motion} direction={-1}/>
   </group>;
 }
 
@@ -856,6 +869,7 @@ function CampusScene({ selected, topic, onSelect, onTopic, motion, reset, intro,
     <MetropolitanBackdrop />
     <CampusCitizens motion={motion}/>
     <NeonStreetlights />
+    <CampusStreetLife motion={motion}/>
     <PavementLightPools />
     <ElevatedDistrict motion={motion}/>
     <AirRoutes motion={motion} />
@@ -1144,7 +1158,8 @@ export default function EngineeringCampus() {
         <h4>{activeTopic.title}</h4><p>{activeTopic.text}</p>
         <div className="campus-spatial-tags">{activeTopic.tags.map(tag=><span key={tag}>{tag}</span>)}</div>
       </div>
-      <button className="campus-interior-link" type="button" aria-expanded={demoOpen} onClick={()=>{if(demoOpen){setDemoOpen(false);}else{setInterior(true);setDemoOpen(true);}}}>{demoOpen?'Close workflow demo':'Run interactive project demo ↗'}</button>
+      <button className="campus-interior-link" type="button" aria-expanded={demoOpen} onClick={()=>{setDemoOpen(value=>!value);}}>{demoOpen?'Hide example workflow':'See how this project works ↗'}</button>
+      <p className="campus-demo-note">Optional step-by-step illustration with sample data. No live project is launched.</p>
       {demoOpen&&<CampusProjectDemo key={active.id} id={active.id} motion={motion} onStep={setTopic}/>}
       <a className="campus-spatial-link" href={`./classic/${active.section}`}>{dossier.route} <span aria-hidden="true">↗</span></a>
       <div className="campus-spatial-nav"><button type="button" disabled={activeIndex<=0} onClick={()=>goTo(zones[activeIndex-1].id)}>← Previous</button><span>{active.label} / 05</span><button type="button" disabled={activeIndex>=zones.length-1} onClick={()=>goTo(zones[activeIndex+1].id)}>Next →</button></div>

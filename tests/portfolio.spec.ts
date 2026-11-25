@@ -49,3 +49,16 @@ test('campus hides the document scrollbar but services remain reachable', async 
   await page.goto('/classic/');
   await expect(page.locator('html')).not.toHaveClass(/campus-page/);
 });
+
+
+test('project walkthrough explicitly uses sample data without entering the building', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('navigation', { name: 'Engineering avenue facilities' }).getByRole('button', { name: /AI Core/ }).click();
+  await page.getByRole('button', { name: 'See how this project works ↗' }).click();
+  await expect(page.getByText('All inputs and outputs are illustrative', { exact: false })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Enter facility ↗', exact: true })).toBeVisible();
+  await page.getByRole('group', { name: 'Workflow stages' }).getByRole('button', { name: /Extract/ }).click();
+  await expect(page.getByText('invoice_id: A-104 · total: €240')).toBeVisible();
+  await page.getByRole('button', { name: 'Hide example workflow' }).click();
+  await expect(page.getByRole('group', { name: 'Workflow stages' })).toHaveCount(0);
+});

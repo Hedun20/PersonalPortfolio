@@ -55,12 +55,12 @@ export function CampusProjectDemo({ id, motion, onStep }: { id:FacilityId; motio
   },[playing,motion,index,demo]);
   function select(i:number){setPlaying(false);setIndex(i);callback.current(demo.steps[i].station);}
   return <div className="campus-demo">
-    <p className="campus-spatial-eyebrow">INTERACTIVE SYSTEM MODEL / SIMULATION</p>
+    <p className="campus-spatial-eyebrow">PROJECT WALKTHROUGH / EXAMPLE</p>
     <h4>{demo.title}</h4>
-    <p className="campus-demo-note">Illustrative workflow · sample data · no live system connection</p>
+    <p className="campus-demo-note">Choose a stage or use Next to follow the example. All inputs and outputs are illustrative, not live system results.</p>
     <div className="campus-demo-stages" role="group" aria-label="Workflow stages">{demo.steps.map((item,i)=><button key={item.name} type="button" aria-pressed={i===index} onClick={()=>select(i)}><span>{String(i+1).padStart(2,'0')}</span>{item.name}</button>)}</div>
-    <div className="campus-demo-io" aria-live="polite"><span>INPUT</span><strong>{step.input}</strong><span>OUTPUT</span><strong>{step.output}</strong><p>{step.detail}</p></div>
-    <div className="campus-demo-actions"><button type="button" onClick={()=>select(Math.max(0,index-1))} disabled={index===0}>Previous</button>{motion&&<button type="button" onClick={()=>{if(playing)setPlaying(false);else{if(index===demo.steps.length-1)setIndex(0);setPlaying(true);}}}>{playing?'Pause':'Run demo'}</button>}<button type="button" onClick={()=>select(Math.min(demo.steps.length-1,index+1))} disabled={index===demo.steps.length-1}>Next</button></div>
+    <div className="campus-demo-io" aria-live="polite"><span>EXAMPLE INPUT</span><strong>{step.input}</strong><span>EXAMPLE OUTPUT</span><strong>{step.output}</strong><p>{step.detail}</p></div>
+    <div className="campus-demo-actions"><button type="button" onClick={()=>select(Math.max(0,index-1))} disabled={index===0}>Previous</button>{motion&&<button type="button" onClick={()=>{if(playing)setPlaying(false);else{if(index===demo.steps.length-1)setIndex(0);setPlaying(true);}}}>{playing?'Pause':'Play walkthrough'}</button>}<button type="button" onClick={()=>select(Math.min(demo.steps.length-1,index+1))} disabled={index===demo.steps.length-1}>Next</button></div>
   </div>;
 }
 

@@ -93,8 +93,8 @@ export function PavementLightPools() {
     const object=new THREE.Object3D();
     for(let i=0;i<17;i++){
       const a=-1.48+i*2.96/16;
-      for(const radius of [9.38,12.17]){
-        object.position.set(Math.sin(a)*radius,.031,4-Math.cos(a)*radius);
+      for(const radius of [9.38,12.17,25.15,36.85,47.85]){
+        object.position.set(Math.sin(a)*radius,radius>20?-.065:.031,4-Math.cos(a)*radius);
         object.rotation.set(-Math.PI/2,0,a);
         object.scale.set(1.95,1.6,1);object.updateMatrix();
         matrices.push(object.matrix.clone());colors.push(new THREE.Color(i%5===0?'#dfb879':'#79c9ee'));
