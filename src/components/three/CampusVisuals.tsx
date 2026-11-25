@@ -29,6 +29,14 @@ export function ArchitecturalSky() {
   </mesh>;
 }
 
+// three.js keeps the shadow policy on the renderer instance, so it is applied
+// through a plain helper that receives the renderer rather than writing to the
+// hook-returned value inside the component body.
+function applyShadowPolicy(renderer: THREE.WebGLRenderer, autoUpdate: boolean) {
+  renderer.shadowMap.autoUpdate=autoUpdate;
+  renderer.shadowMap.needsUpdate=true;
+}
+
 // Static outdoor shadows are captured once per mount / quality change, rather
 // than rebuilding the shadow map on every animation frame. Interiors restore
 // the renderer's previous shadow policy on unmount.
@@ -37,9 +45,8 @@ function ExteriorShadowPolicy({ enabled }: { enabled: boolean }) {
   useLayoutEffect(()=>{
     if(!enabled)return;
     const previous=gl.shadowMap.autoUpdate;
-    gl.shadowMap.autoUpdate=false;
-    gl.shadowMap.needsUpdate=true;
-    return ()=>{gl.shadowMap.autoUpdate=previous;gl.shadowMap.needsUpdate=true;};
+    applyShadowPolicy(gl,false);
+    return ()=>{applyShadowPolicy(gl,previous);};
   },[gl,enabled]);
   return null;
 }

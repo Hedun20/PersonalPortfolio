@@ -715,49 +715,52 @@ function PremiumFacade({ zone }: { zone: Zone }) {
 
 // Keyboard navigation is scoped to the focused canvas; page shortcuts and text inputs stay native.
 const navigationKeys = new Set(['w','a','s','d','arrowup','arrowleft','arrowdown','arrowright']);
+// The canvas element is imperative DOM state, so its listeners and a11y attributes
+// are attached by a plain helper that receives the element instead of writing to
+// the hook-returned renderer inside the component body.
+function attachCampusKeys(canvas: HTMLCanvasElement, keys: Set<string>) {
+  const originalTabIndex=canvas.getAttribute('tabindex');
+  const originalLabel=canvas.getAttribute('aria-label');
+  canvas.tabIndex=0;
+  canvas.setAttribute('aria-label','3D scene. Use W A S D or arrow keys to move.');
+  const focus=()=>canvas.focus({preventScroll:true});
+  const down=(event:KeyboardEvent)=>{
+    const key=event.key.toLowerCase();
+    if(!navigationKeys.has(key)||event.altKey||event.ctrlKey||event.metaKey)return;
+    event.preventDefault(); keys.add(key);
+  };
+  const up=(event:KeyboardEvent)=>{keys.delete(event.key.toLowerCase());};
+  const clear=()=>keys.clear();
+  canvas.addEventListener('pointerdown',focus);
+  canvas.addEventListener('keydown',down);
+  window.addEventListener('keyup',up);
+  canvas.addEventListener('blur',clear);
+  window.addEventListener('blur',clear);
+  return ()=>{
+    canvas.removeEventListener('pointerdown',focus); canvas.removeEventListener('keydown',down);
+    window.removeEventListener('keyup',up);canvas.removeEventListener('blur',clear);window.removeEventListener('blur',clear);
+    clear();
+    if(originalTabIndex===null)canvas.removeAttribute('tabindex');else canvas.setAttribute('tabindex',originalTabIndex);
+    if(originalLabel===null)canvas.removeAttribute('aria-label');else canvas.setAttribute('aria-label',originalLabel);
+  };
+}
 function useCampusKeys() {
   const { gl } = useThree();
   const keys=useRef(new Set<string>());
-  useEffect(()=>{
-    const canvas=gl.domElement;
-    const originalTabIndex=canvas.getAttribute('tabindex');
-    const originalLabel=canvas.getAttribute('aria-label');
-    canvas.tabIndex=0;
-    canvas.setAttribute('aria-label','3D scene. Use W A S D or arrow keys to move.');
-    const focus=()=>canvas.focus({preventScroll:true});
-    const down=(event:KeyboardEvent)=>{
-      const key=event.key.toLowerCase();
-      if(!navigationKeys.has(key)||event.altKey||event.ctrlKey||event.metaKey)return;
-      event.preventDefault(); keys.current.add(key);
-    };
-    const up=(event:KeyboardEvent)=>{keys.current.delete(event.key.toLowerCase());};
-    const clear=()=>keys.current.clear();
-    canvas.addEventListener('pointerdown',focus);
-    canvas.addEventListener('keydown',down);
-    window.addEventListener('keyup',up);
-    canvas.addEventListener('blur',clear);
-    window.addEventListener('blur',clear);
-    return ()=>{
-      canvas.removeEventListener('pointerdown',focus); canvas.removeEventListener('keydown',down);
-      window.removeEventListener('keyup',up);canvas.removeEventListener('blur',clear);window.removeEventListener('blur',clear);
-      clear();
-      if(originalTabIndex===null)canvas.removeAttribute('tabindex');else canvas.setAttribute('tabindex',originalTabIndex);
-      if(originalLabel===null)canvas.removeAttribute('aria-label');else canvas.setAttribute('aria-label',originalLabel);
-    };
-  },[gl]);
+  useEffect(()=>attachCampusKeys(gl.domElement, keys.current),[gl]);
   return keys;
 }
 function useKeyboardPan() {
   const keys=useCampusKeys();
   const {camera}=useThree();
-  const forward=useMemo(()=>new THREE.Vector3(),[]);
-  const right=useMemo(()=>new THREE.Vector3(),[]);
-  const delta=useMemo(()=>new THREE.Vector3(),[]);
+  // Reused scratch vectors live in a ref so the pan loop keeps one allocation per instance.
+  const scratch=useRef({ forward:new THREE.Vector3(), right:new THREE.Vector3(), delta:new THREE.Vector3() });
   return (target:THREE.Vector3,dt:number,speed:number)=>{
     const pressed=keys.current;
     const x=Number(pressed.has('d')||pressed.has('arrowright'))-Number(pressed.has('a')||pressed.has('arrowleft'));
     const z=Number(pressed.has('w')||pressed.has('arrowup'))-Number(pressed.has('s')||pressed.has('arrowdown'));
     if(!x&&!z)return false;
+    const {forward,right,delta}=scratch.current;
     camera.getWorldDirection(forward);forward.y=0;forward.normalize();
     right.set(-forward.z,0,forward.x);
     delta.copy(forward).multiplyScalar(z).addScaledVector(right,x).normalize().multiplyScalar(speed*Math.min(dt,.05));
@@ -873,6 +876,12 @@ function CampusScene({ selected, topic, onSelect, onTopic, motion, reset, intro,
   </>;
 }
 
+// The pointer cursor is set on the canvas element, so it is routed through a plain
+// helper that receives the renderer instead of writing to the hook-returned value.
+function setCanvasCursor(renderer: THREE.WebGLRenderer, cursor: string) {
+  renderer.domElement.style.cursor=cursor;
+}
+
 // Architectural cutaway: the exterior scene is unmounted while a room is open.
 // Each exhibit maps to the same three topics used by the exterior callouts.
 function InteriorExhibit({ zone, index, active, motion, onSelect }: { zone: Zone; index: number; active: boolean; motion: boolean; onSelect: () => void }) {
@@ -882,7 +891,7 @@ function InteriorExhibit({ zone, index, active, motion, onSelect }: { zone: Zone
   const color=zone.color;
   const x=(index-1)*3.0;
   const type=zone.id==='ai'?['rack','core','console'][index]:zone.id==='software'?['console','table','rack'][index]:zone.id==='data'?['rack','rack','table'][index]:zone.id==='command'?['console','table','console'][index]:['core','table','core'][index];
-  return <group position={[x,0,-.5]} onPointerOver={e=>{e.stopPropagation();gl.domElement.style.cursor='pointer';}} onPointerOut={()=>{gl.domElement.style.cursor='';}} onClick={e=>{e.stopPropagation();if(e.delta<5)onSelect();}}>
+  return <group position={[x,0,-.5]} onPointerOver={e=>{e.stopPropagation();setCanvasCursor(gl,'pointer');}} onPointerOut={()=>{setCanvasCursor(gl,'');}} onClick={e=>{e.stopPropagation();if(e.delta<5)onSelect();}}>
     <ContactFootprint position={[0,.053,0]} size={[2.92,3.04]} opacity={.58}/>
     <Block position={[0,.13,0]} size={[2.42,.24,2.65]} color="#405665" finish="stone"/>
     <Block position={[0,.28,0]} size={[2.30,.07,2.53]} color="#172b39"/>
