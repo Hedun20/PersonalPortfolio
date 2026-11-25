@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { FusionReactor } from './FusionReactor';
+import { EnergyBeam, energyPoint } from './CampusBeams';
 import { ArchitecturalFinish } from './CampusMaterials';
 
 const CENTER_Z = 4;
@@ -160,7 +161,10 @@ function RadialConduit({angle,start,end,width,height,color,motion,speed,packets}
 }
 
 export function FacilityEnergyLink({ angle, color, motion }: { angle: number; color: string; motion: boolean }) {
-  return <RadialConduit angle={angle} start={4.18} end={13.9} width={.74} height={.13} color={color} speed={.88} packets={3} motion={motion}/>;
+  return <group>
+    <RadialConduit angle={angle} start={4.18} end={13.9} width={.74} height={.13} color={color} speed={.88} packets={3} motion={motion}/>
+    <EnergyBeam from={energyPoint(angle,3.85,1.04)} to={energyPoint(angle,13.95,.59)} color={color} radius={.22} motion={motion}/>
+  </group>;
 }
 
 const channels: Channel[] = [
@@ -180,12 +184,33 @@ export function CampusEnergy({ motion, focused }: { motion: boolean; focused: bo
   const narrow = useThree(state => state.size.width < 900);
   return <group>
     <FusionReactor motion={motion}/>
+    {!focused && <EnergyBeam from={[0,3.12,4]} to={[0,16.8,4]} color="#70e6ff" radius={.43} motion={motion} fadeEnd/>}
+    <RingBridges motion={motion}/>
     {channels.map((channel,index)=> (!narrow || index!==9) && <RingChannel key={channel.radius} channel={channel} motion={motion}/>)}
-    {[-1.68,-1.12,-.56,0,.56,1.12,1.68].filter((_,i)=>!narrow||i%2===0).map(angle=><PeripheralFeed key={angle} angle={angle} motion={motion && !focused} end={narrow?35.7:46.7}/>)}
+    {[-1.68,-1.12,-.56,0,.56,1.12,1.68].filter((_,i)=>!narrow||i%2===0).map(angle=><PeripheralFeed key={angle} angle={angle} motion={motion} end={narrow?35.7:46.7}/>)}
   </group>;
 }
 
 function PeripheralFeed({ angle, motion, end }: { angle: number; motion: boolean; end: number }) {
   // The previous road-spoke corridors are clear of tower footprints; use them as energy feeds.
   return <RadialConduit angle={angle} start={22} end={end} width={.48} height={-.045} color="#6bbfff" speed={.6} packets={5} motion={motion}/>;
+}
+
+// Bridge the gap through the open corridors BETWEEN the five facilities.
+// The outer spokes meet these bridges on the radius-24 distribution ring.
+function RingBridges({motion}:{motion:boolean}) {
+  return <group>
+    {[-1.48,-.8625,-.2875,.2875,.8625,1.48].map((angle,i)=><group key={angle}>
+      <RadialConduit angle={angle} start={11.95} end={24} width={.65} height={.09} color={i%2?'#a39aff':'#64d9ff'} speed={.63} packets={4} motion={motion}/>
+      <EnergyBeam from={energyPoint(angle,11.95,.50)} to={energyPoint(angle,24,.50)} radius={.14} color="#55d7ff" motion={motion}/>
+      {[11.95,24].map(radius=><mesh key={radius} position={energyPoint(angle,radius,.19)} raycast={NO_RAYCAST}>
+        <cylinderGeometry args={[.42,.51,.27,12]}/><meshStandardMaterial color="#4a7187" metalness={.76} roughness={.34} emissive="#36c4ef" emissiveIntensity={.35}/>
+      </mesh>)}
+    </group>)}
+    {[-1.48,1.48].map(angle=><group key={angle}>
+      <EnergyBeam from={energyPoint(angle,18.85,.34)} to={energyPoint(angle,18.85,3.9)} radius={.16} color="#969dff" motion={motion}/>
+      <EnergyBeam from={energyPoint(angle,18.85,3.9)} to={energyPoint(angle,20.3,6.52)} radius={.17} color="#63dfff" motion={motion}/>
+      <EnergyBeam from={energyPoint(angle,20.3,6.52)} to={energyPoint(angle,24,.50)} radius={.18} color="#63dfff" motion={motion}/>
+    </group>)}
+  </group>;
 }

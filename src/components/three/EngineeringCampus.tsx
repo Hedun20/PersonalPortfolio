@@ -320,6 +320,11 @@ function Base() {
     <SurfaceFloor position={[0,-.2,-8]} size={[126,104]} color="#14232e" repeat={40} finish="stone"/>
     <gridHelper args={[70,35,'#274b62','#142b3a']} position={[0,-.17,-8]} />
     <ArcStrip inner={8.7} outer={FACILITY_RADIUS+2.65} y={-.10} color="#263943" finish="stone"/>
+    <ArcStrip inner={12.65} outer={14.35} y={-.025} color="#354b59" finish="stone"/>
+    <ArcStrip inner={12.59} outer={12.67} y={.022} color="#748d9e"/>
+    <ArcStrip inner={14.33} outer={14.42} y={.022} color="#748d9e"/>
+    <ArcStrip inner={13.42} outer={13.49} y={.027} color="#4388ad" glow/>
+    <MainAvenueDetails/>
     <ArcStrip inner={9.25} outer={12.35} y={.015} color="#142631"/>
     <Cylinder position={[0,-.12,ARC_CENTER_Z]} radius={7.5} height={.15} sides={64} color="#182b39"/>
     <PolishedPlaza/>
@@ -351,6 +356,29 @@ function DetailInstances({ items, glowing = false }: { items: DetailBox[]; glowi
     <boxGeometry args={[1, 1, 1]} />
     {glowing ? <meshBasicMaterial color="#ffffff" toneMapped={false} /> : <meshStandardMaterial color="#ffffff" roughness={0.42} metalness={0.53} />}
   </instancedMesh>;
+}
+
+// Premium technical concourse: modular paving, seam details and low energy
+// terminals, all batched; leave the radial connections and facility pads open.
+function MainAvenueDetails(){
+  const {structures,lights}=useMemo(()=>{
+    const structures:DetailBox[]=[],lights:DetailBox[]=[];
+    for(let i=0;i<64;i++){
+      const a=-1.50+i*3/63,rotation:Vec3=[0,-a,0];
+      if(zones.some(zone=>Math.abs(zone.angle-a)<.055))continue;
+      for(const radius of [12.88,14.12]){
+        structures.push({position:arcPoint(a,radius,.02),size:[.53,.045,.29],color:i%2?'#465e6f':'#3a515f',rotation});
+        lights.push({position:arcPoint(a,radius,.051),size:[.32,.018,.026],color:i%5===0?'#9eafff':'#57bddd',rotation});
+      }
+      if(i%6===0 && !zones.some(zone=>Math.abs(zone.angle-a)<.16)){
+        structures.push({position:arcPoint(a,13.05,.15),size:[.32,.28,.40],color:'#384f60',rotation});
+        structures.push({position:arcPoint(a,13.05,.34),size:[.18,.20,.26],color:'#78909f',rotation});
+        lights.push({position:arcPoint(a,13.05,.45),size:[.16,.028,.18],color:'#b4eeff',rotation});
+      }
+    }
+    return {structures,lights};
+  },[]);
+  return <group><DetailInstances items={structures}/><DetailInstances items={lights} glowing/></group>;
 }
 
 // Three outer infrastructure rings surround the facility network.
@@ -705,7 +733,7 @@ function CampusScene({ selected, topic, onSelect, onTopic, motion, reset, intro,
     </group>)}
     <CampusCamera selected={selected} motion={motion} reset={reset} intro={intro} onIntroEnd={onIntroEnd}/>
     <DataRain motion={motion} focused={selected!==null} />
-    <EffectComposer multisampling={0}><Bloom mipmapBlur intensity={0.51} luminanceThreshold={1.25} luminanceSmoothing={0.32} /></EffectComposer>
+    <EffectComposer multisampling={0}><Bloom mipmapBlur intensity={0.65} luminanceThreshold={1.15} luminanceSmoothing={0.32} /></EffectComposer>
   </>;
 }
 

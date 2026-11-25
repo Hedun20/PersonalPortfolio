@@ -1,6 +1,6 @@
 # Development Progress
 
-> **Last updated:** 2026-11-25 · reactor architecture iteration based on `c2484f4` · candidate, not accepted.
+> **Last updated:** 2026-11-25 · energy connectivity and concourse iteration based on `aa05a51` · candidate, not accepted.
 
 ## Current Snapshot
 
@@ -12,7 +12,8 @@
 - `d1bdc39` / `ef08e45`: city-first home, classic route, service cards, hidden document scrollbar with scrolling retained.
 - `ab21902`: street-life experiment and clearer optional project walkthrough. Owner rejected the urban simulation aesthetic; the walkthrough remains.
 - `c4a681c` / `c2484f4`: removed exterior NPCs, vehicles, elevated shuttles, cafes and fountain; added energy rings and initial core. Owner requested higher architectural fidelity.
-- This candidate: replace simple core with a larger machined containment assembly, segmented metallic armor, copper coil packs, arched ribs, glass chamber, plasma filament shader and restrained field animation. Static geometry is merged by finish (five batches), with fewer segments on narrow screens. Add metal housings, paired rails and multiple light strands to energy channels. Keep existing buildings and navigation; no external assets or dependencies.
+- `1475ddc` / `aa05a51`: larger machined fusion reactor and volumetric conduit rails.
+- This candidate: preserve that reactor, add Oa-inspired original cyan/violet volumetric filament beams (including a vertical beacon in overview), six gap corridors connecting inner ring to outer radius 24, elevated risers at both edges, modular concourse paving and luminous terminals. Restore 152 world / 38 near-camera cubes on desktop (64 / 16 narrow), each with instanced metallic edge frame and pulsing neon core. No external assets or dependencies.
 
 ### Verification and blockers
 - No lint/build/browser run on this candidate SHA yet. Run the README commands before acceptance. The available remote repository connection does not provide a local dependency installation or browser runtime.
