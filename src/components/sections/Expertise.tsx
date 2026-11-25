@@ -1,4 +1,5 @@
 import ClassicBackdrop from '../three/ClassicBackdrop';
+import { expertiseData } from '../../data/expertise';
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Brain, Code2, LayoutGrid, Building2, Server, Bot } from 'lucide-react';
@@ -57,51 +58,6 @@ function ExpertiseCard({ title, description, technologies, icon: Icon, index }: 
   );
 }
 
-const expertiseData = [
-  {
-    title: 'Artificial Intelligence',
-    description:
-      'Local LLM deployment, RAG pipelines, OCR, embeddings, and intelligent agent orchestration for private AI systems.',
-    technologies: ['Qwen', 'Gemma', 'RAG', 'OCR', 'Embeddings'],
-    iconName: 'Brain',
-  },
-  {
-    title: 'Full-Stack Engineering',
-    description:
-      'End-to-end application development with modern React ecosystems, TypeScript, and performant backend architectures.',
-    technologies: ['React', 'TypeScript', 'Node.js', 'Tailwind CSS'],
-    iconName: 'Code2',
-  },
-  {
-    title: 'Software Architecture',
-    description:
-      'Scalable system design, modular component architecture, microservice patterns, and enterprise-grade solutions.',
-    technologies: ['System Design', 'Microservices', 'Domain-Driven'],
-    iconName: 'LayoutGrid',
-  },
-  {
-    title: 'Enterprise Applications',
-    description:
-      'Business management platforms with role-based permissions, document workflows, and automated processes.',
-    technologies: ['RBAC', 'Workflows', 'Document Mgmt'],
-    iconName: 'Building2',
-  },
-  {
-    title: 'Infrastructure & DevOps',
-    description:
-      'Containerized deployments, CI/CD pipelines, Linux server management, and reliable infrastructure.',
-    technologies: ['Docker', 'CI/CD', 'Nginx', 'Linux'],
-    iconName: 'Server',
-  },
-  {
-    title: 'Automation & AI Agents',
-    description:
-      'Intelligent automation systems connecting models, tools, and APIs into self-directed engineering workflows.',
-    technologies: ['AI Agents', 'Workflows', 'API Integration'],
-    iconName: 'Bot',
-  },
-];
-
 export default function Expertise() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
@@ -134,7 +90,7 @@ export default function Expertise() {
               title={item.title}
               description={item.description}
               technologies={item.technologies}
-              icon={iconComponents[item.iconName]}
+              icon={iconComponents[item.icon]}
               index={i}
             />
           ))}
