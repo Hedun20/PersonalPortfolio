@@ -62,3 +62,15 @@ test('project walkthrough explicitly uses sample data without entering the build
   await page.getByRole('button', { name: 'Hide example workflow' }).click();
   await expect(page.getByRole('group', { name: 'Workflow stages' })).toHaveCount(0);
 });
+
+
+test('energy network overview preserves facility navigation without WebGL', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('DISTRICT OVERVIEW / QUANTUM ENERGY NETWORK')).toBeVisible();
+  const directory = page.getByRole('navigation', { name: 'Engineering avenue facilities' });
+  await expect(directory.getByRole('button')).toHaveCount(5);
+  await directory.getByRole('button', { name: /Research Lab/ }).click();
+  await expect(page.getByRole('heading', { name: 'Research Lab', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByText('DISTRICT OVERVIEW / QUANTUM ENERGY NETWORK')).toBeVisible();
+});

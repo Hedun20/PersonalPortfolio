@@ -8,6 +8,11 @@ Transform the PersonalPortfolio project into an immersive 3D engineering portfol
 - **Typography**: Inter (body) + Space Grotesk (headings)
 - **Vibe**: Professional, technical, futuristic but grounded
 
+## Energy network visual direction
+- Original low-profile hemispherical fusion core surrounded by animated cyan/violet energy channels, facility feeds and elevated conduits.
+- No civilian NPCs, vehicles, cafes or road markings in the active exterior. Preserve the five existing interactive facilities, interiors and accessibility fallback.
+- The fusion/quantum styling is a fictional visual metaphor for connected software systems, not a claim about physical technology.
+
 ## 3D Zones
 1. **AI Core** — LLM systems, prompt engineering, AI agent architecture
 2. **Software Engineering Lab** — Full-stack development, system design

@@ -3,12 +3,12 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, Html, Lightformer, OrbitControls, RoundedBox } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import * as THREE from 'three';
-import { CampusStreetLife, DataRain, NeonStreetlights } from './CampusAtmosphere';
+import { DataRain } from './CampusAtmosphere';
+import { CampusEnergy, FacilityEnergyLink } from './CampusEnergy';
 import { ArchitecturalFinish, CampusMaterialProvider, ContactFootprint, PolishedPlaza } from './CampusMaterials';
 import { ArchitecturalSlab, FacilityArchitecture } from './CampusArchitecture';
-import { ArchitecturalSky, CityLighting, PavementLightPools } from './CampusVisuals';
+import { ArchitecturalSky, CityLighting } from './CampusVisuals';
 import { CampusProjectDemo, WorkflowSignal } from './CampusProjectDemo';
-import { CampusCitizens } from './CampusCitizens';
 import { contact } from '../../data/contact';
 import './EngineeringCampus.css';
 
@@ -16,9 +16,8 @@ type Vec3 = [number, number, number];
 type ZoneId = 'ai' | 'software' | 'data' | 'command' | 'research';
 type Zone = { angle: number; id: ZoneId; label: string; name: string; position: Vec3; color: string; description: string; section: string };
 
-// The boulevard curves around a public arrival plaza. All five facilities face inward.
+// Five facilities surround the central energy distribution core.
 const ARC_CENTER_Z = 4;
-const ROAD_RADIUS = 10.8;
 const FACILITY_RADIUS = 16.1;
 const ARC_END = Math.PI / 2;
 function arcPoint(angle: number, radius: number, y = 0): Vec3 {
@@ -300,20 +299,7 @@ function Research({ color, motion }: { color: string; motion: boolean }) {
   </group>;
 }
 
-function LinkTrack({ zone, motion }: { zone: Zone; motion: boolean }) {
-  const pulse = useRef<THREE.Group>(null);
-  const start = ROAD_RADIUS + 1.55, end = FACILITY_RADIUS - 1.92;
-  useFrame((state)=>{if(pulse.current) pulse.current.position.set(...arcPoint(zone.angle,THREE.MathUtils.lerp(start,end,motion?(state.clock.elapsedTime*.48+Number(zone.label)*.17)%1:.5),.095));});
-  const a = arcPoint(zone.angle,start,.065), b = arcPoint(zone.angle,end,.065);
-  const mid = arcPoint(zone.angle,(start+end)/2,.015);
-  return <group>
-    <Block position={mid} rotation={[0,-zone.angle,0]} size={[1.24,.08,end-start+.15]} color="#33434e" />
-    {[-1,1].map(side=><Rail key={side} from={[a[0]+side*.47*Math.cos(zone.angle),.085,a[2]+side*.47*Math.sin(zone.angle)]} to={[b[0]+side*.47*Math.cos(zone.angle),.085,b[2]+side*.47*Math.sin(zone.angle)]} color={zone.color} light width={.038} />)}
-    <group ref={pulse} rotation={[0,-zone.angle,0]}><Block position={[0,0,0]} size={[.78,.05,.16]} color={zone.color} light /></group>
-  </group>;
-}
-
-// A continuous annular strip rather than dozens of visibly joined straight road segments.
+// Continuous annular housing for the energy conduits.
 function ArcStrip({ inner, outer, y, color, glow = false, end = ARC_END, finish }: { inner: number; outer: number; y: number; color: string; glow?: boolean; end?: number; finish?: 'asphalt'|'stone' }) {
   const geometry = useMemo(()=>{
     const vertices: number[] = [], indices: number[] = [], uvs: number[] = [];
@@ -329,53 +315,14 @@ function ArcStrip({ inner, outer, y, color, glow = false, end = ARC_END, finish 
   return <mesh geometry={geometry} receiveShadow={!glow}>{glow ? <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.8} toneMapped={false} /> : <ArchitecturalFinish color={color} finish={finish??'titanium'} detail={Boolean(finish)}/>}</mesh>;
 }
 
-function AvenuePulse({ motion, lane }: { motion: boolean; lane: number }) {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((state)=>{if(ref.current){const a=-ARC_END+((state.clock.elapsedTime*.26+lane*.45+10)%1)*ARC_END*2; const angle=motion?a:lane*.45; ref.current.position.set(...arcPoint(angle,ROAD_RADIUS+lane*1.22,.105)); ref.current.rotation.y=-angle;}});
-  return <group ref={ref}><Block position={[0,0,0]} size={[.9,.035,.05]} color="#a5efff" light /></group>;
-}
-
-function Base({ motion }: { motion: boolean }) {
-  const details=useMemo(()=>{
-    const structures: DetailBox[]=[], lights: DetailBox[]=[];
-    for(let i=0;i<48;i++){
-      const a=-ARC_END+(i+.5)/48*ARC_END*2;
-      const rotation: Vec3=[0,-a,0];
-      structures.push({position:arcPoint(a,ROAD_RADIUS,.055),size:[.37,.022,.035],color:'#69808f',rotation});
-      for(const side of [-1,1]){
-        structures.push({position:arcPoint(a,ROAD_RADIUS+side*1.82,.035),size:[.52,.055,.21],color:i%2?'#354c5d':'#435a69',rotation});
-        if(i%3===0)lights.push({position:arcPoint(a,ROAD_RADIUS+side*1.82,.069),size:[.27,.025,.045],color:'#73bbd0',rotation});
-      }
-    }
-    return {structures,lights};
-  },[]);
+function Base() {
   return <group>
-    <SurfaceFloor position={[0,-.2,-8]} size={[126,104]} color="#1e2933" repeat={40} finish="asphalt"/>
-    <gridHelper args={[70,35,'#203341','#162530']} position={[0,-.17,-8]} />
-    <ArcStrip inner={ROAD_RADIUS-2.1} outer={FACILITY_RADIUS+2.65} y={-.10} color="#384750" finish="stone" />
-    <ArcStrip inner={ROAD_RADIUS-1.44} outer={ROAD_RADIUS+1.44} y={.015} color="#28343d" finish="asphalt" />
-    {[-1,1].map(side=><group key={side}>
-      <ArcStrip inner={ROAD_RADIUS+side*1.48-.045} outer={ROAD_RADIUS+side*1.48+.045} y={.08} color="#61d8f1" glow />
-      <ArcStrip inner={ROAD_RADIUS+side*1.95-.04} outer={ROAD_RADIUS+side*1.95+.04} y={.035} color="#577082" />
-      {Array.from({length:9},(_,i)=>{const a=-1.45+i*2.9/8;return <group key={i} position={arcPoint(a,ROAD_RADIUS+side*1.97)} rotation={[0,-a,0]}>
-        <Block position={[0,.13,0]} size={[.29,.26,.32]} color="#314654" />
-        <Block position={[0,.71,0]} size={[.09,1.22,.10]} color="#738795" />
-        <Block position={[0,1.31,side*.19]} size={[.15,.085,.49]} color="#536777" />
-        <Block position={[0,1.26,side*.21]} size={[.10,.036,.32]} color="#b4eaff" light />
-      </group>;})}
-    </group>)}
-    <DetailInstances items={details.structures} /><DetailInstances items={details.lights} glowing />
-    <AvenuePulse motion={motion} lane={-1}/><AvenuePulse motion={motion} lane={1}/>
-    {/* The road terminates at two transit portals; vehicles vanish beyond them. */}
-    {[-1,1].map(side=><group key={side} position={arcPoint(side*ARC_END,ROAD_RADIUS)} rotation={[0,-side*ARC_END+Math.PI/2,0]}>
-      {[-1,1].map(x=><group key={x}><Block position={[x*1.55,.95,0]} size={[.33,1.9,.48]} color="#364c5b" /><Block position={[x*1.36,.98,.27]} size={[.05,1.64,.05]} color="#72d7f4" light /></group>)}
-      <Block position={[0,1.98,0]} size={[3.42,.24,.52]} color="#536b7a" /><Block position={[0,2.08,.28]} size={[2.75,.04,.05]} color="#8eeaff" light />
-    </group>)}
-    {/* Empty inner plaza stays low so all five architectural silhouettes remain visible. */}
-    <Cylinder position={[0,-.12,ARC_CENTER_Z]} radius={7.5} height={.15} sides={64} color="#182b39" />
-    <PolishedPlaza />
-    <ArcStrip inner={6.95} outer={7.0} y={-.025} color="#375a6b" />
-    <ArcStrip inner={5.95} outer={6.0} y={-.025} color="#29495c" />
+    <SurfaceFloor position={[0,-.2,-8]} size={[126,104]} color="#14232e" repeat={40} finish="stone"/>
+    <gridHelper args={[70,35,'#274b62','#142b3a']} position={[0,-.17,-8]} />
+    <ArcStrip inner={8.7} outer={FACILITY_RADIUS+2.65} y={-.10} color="#263943" finish="stone"/>
+    <ArcStrip inner={9.25} outer={12.35} y={.015} color="#142631"/>
+    <Cylinder position={[0,-.12,ARC_CENTER_Z]} radius={7.5} height={.15} sides={64} color="#182b39"/>
+    <PolishedPlaza/>
   </group>;
 }
 
@@ -413,25 +360,7 @@ function MetropolitanBackdrop() {
     const structures:DetailBox[]=[],lights:DetailBox[]=[];
     const put=(target:DetailBox[],position:Vec3,size:Vec3,color:string,rotation:Vec3=[0,0,0])=>target.push({position,size,color,rotation});
     const sectors=6, end=1.68, span=2*end/sectors;
-    // Road spokes join the curved ring roads, beginning behind the main buildings.
-    for(let i=0;i<=sectors;i++){
-      const a=-end+i*span, rotation:Vec3=[0,-a,0];
-      put(structures,arcPoint(a,40.4,-.115),[2.5,.06,35.2],'#192831',rotation);
-      for(const side of [-1,1]){
-        const p=arcPoint(a,40.4,-.055);
-        put(structures,[p[0]+side*1.5*Math.cos(a),p[1],p[2]+side*1.5*Math.sin(a)],[.56,.09,35.2],'#435762',rotation);
-      }
-      for(let j=0;j<12;j++)put(lights,arcPoint(a,23+j*2.9,-.065),[.045,.025,.72],'#668e9e',rotation);
-    }
-    // Short pedestrian/maintenance streets between the five principal facilities.
-    for(let i=0;i<zones.length-1;i++){
-      const a=(zones[i].angle+zones[i+1].angle)/2, rotation:Vec3=[0,-a,0];
-      put(structures,arcPoint(a,18.45,-.105),[1.30,.09,10.7],'#23333e',rotation);
-      for(const side of [-1,1]){
-        const p=arcPoint(a,18.45,-.048);
-        put(lights,[p[0]+side*.61*Math.cos(a),p[1],p[2]+side*.61*Math.sin(a)],[.035,.025,10.4],'#477f92',rotation);
-      }
-    }
+    // The skyline remains an architectural backdrop, not a traffic simulation.
     for(let ring=0;ring<3;ring++){
       const r=[30.0,41.9,53.1][ring];
       for(let sector=0;sector<sectors;sector++){
@@ -471,28 +400,18 @@ function MetropolitanBackdrop() {
         }
       }
     }
-    // Street lights along the back neighbourhoods: one batched mesh per material.
-    for(const r of [26.1,37.8,48.8])for(let i=0;i<(narrow?15:25);i++){
-      const a=-1.58+i*3.16/((narrow?15:25)-1),rotation:Vec3=[0,-a,0];
-      put(structures,arcPoint(a,r, .65),[.075,1.50,.075],'#586c7a',rotation);
-      put(structures,arcPoint(a,r-.18,1.39),[.12,.10,.43],'#8497a0',rotation);
-      put(lights,arcPoint(a,r-.21,1.33),[.1,.035,.32],i%5===0?'#f4cc9d':'#8cdcf3',rotation);
-    }
-    for(let i=0;i<14;i++){
-      const a=-1.43+i*2.86/13,rotation:Vec3=[0,-a,0];
-      put(structures,arcPoint(a,8,.015),[.76,.075,.52],'#43596a',rotation);
-      put(lights,arcPoint(a,8,.064),[.43,.02,.038],'#6aa4b5',rotation);
-      if(i%3===0){put(structures,arcPoint(a,6.9,.17),[.7,.26,.33],'#253d4b',rotation);put(structures,arcPoint(a,6.9,.32),[.74,.06,.36],'#59717d',rotation);}
+    // Sparse perimeter relays with vertical illuminated conductors.
+    for(const radius of [26.1,37.8,48.8])for(let i=0;i<(narrow?8:14);i++){
+      const a=-1.50+i*3/((narrow?8:14)-1),rotation:Vec3=[0,-a,0];
+      put(structures,arcPoint(a,radius,.12),[.56,.35,.56],'#344b58',rotation);
+      put(structures,arcPoint(a,radius,.85),[.20,1.50,.24],'#4a6678',rotation);
+      put(lights,arcPoint(a,radius-.14,.86),[.07,1.25,.06],'#63d4ff',rotation);
+      put(lights,arcPoint(a,radius,1.61),[.26,.13,.26],i%4===0?'#b4a1ff':'#94ebff',rotation);
     }
     return {structures,lights};
   },[narrow]);
   return <group>
-    {[24,35.7,46.7].map(r=><group key={r}>
-      <ArcStrip inner={r-2.2} outer={r+2.2} y={-.12} color="#3a4c57" end={1.68} finish="stone"/>
-      <ArcStrip inner={r-1.6} outer={r+1.6} y={-.075} color="#172731" end={1.68} finish="asphalt"/>
-      {[-1,1].map(side=><ArcStrip key={side} inner={r+side*1.62-.025} outer={r+side*1.62+.025} y={-.045} color="#61899b" end={1.68}/>)}
-    </group>)}
-    <ArcStrip inner={7.42} outer={7.47} y={.025} color="#658e9f"/>
+    {[24,35.7,46.7].map(radius=><ArcStrip key={radius} inner={radius-1.1} outer={radius+1.1} y={-.12} color="#1a303d" end={1.68}/>)}
     <DetailInstances key={`district-${structures.length}`} items={structures}/><DetailInstances key={`windows-${lights.length}`} items={lights} glowing/>
   </group>;
 }
@@ -512,28 +431,7 @@ function ArcWall({ radius, bottom, top, color, end = 1.65 }: { radius:number; bo
   useEffect(()=>()=>geometry.dispose(),[geometry]);
   return <mesh geometry={geometry}><meshStandardMaterial color={color} metalness={.55} roughness={.38} side={THREE.DoubleSide}/></mesh>;
 }
-function ElevatedShuttle({ motion, phase, color }: { motion:boolean; phase:number; color:string }) {
-  const train=useRef<THREE.Group>(null), elapsed=useRef(0);
-  useFrame((_,dt)=>{
-    if(!train.current)return;
-    if(motion)elapsed.current+=Math.min(dt,.1);
-    const a=-1.93+((elapsed.current*.031+phase)%1)*3.86;
-    train.current.position.set(...arcPoint(a,UPPER_RADIUS,UPPER_Y+.32));
-    train.current.rotation.y=Math.atan2(Math.cos(a),Math.sin(a));
-    const scale=1-THREE.MathUtils.smoothstep(Math.abs(a),1.60,1.86);
-    train.current.visible=scale>.001; train.current.scale.setScalar(Math.max(.001,scale));
-  });
-  return <group ref={train}>
-    {[-.66,.66].map(z=><group key={z} position={[0,0,z]}>
-      <mesh scale={[.32,.19,.64]}><sphereGeometry args={[1,24,12]}/><meshPhysicalMaterial color="#314c61" metalness={.72} roughness={.21} clearcoat={.9}/></mesh>
-      <mesh position={[0,.1,.07]} scale={[.28,.11,.49]}><sphereGeometry args={[1,16,8]}/><meshPhysicalMaterial color="#648b9f" metalness={.57} roughness={.17} clearcoat={1}/></mesh>
-      {[-1,1].map(side=><group key={side}><Block position={[side*.27,.01,0]} size={[.045,.036,1.04]} color={color} light/><Block position={[side*.18,-.12,0]} size={[.14,.035,.88]} color={color} light/></group>)}
-      <Block position={[0,.02,.58]} size={[.22,.045,.055]} color="#b5f3ff" light/>
-    </group>)}
-    <Block position={[0,-.035,0]} size={[.23,.11,.24]} color="#344b5b"/>
-  </group>;
-}
-function ElevatedDistrict({ motion }: { motion:boolean }) {
+function ElevatedDistrict() {
   const { structures, lights } = useMemo(()=>{
     const structures:DetailBox[]=[], lights:DetailBox[]=[];
     const add=(position:Vec3,size:Vec3,color:string,rotation:Vec3=[0,0,0])=>structures.push({position,size,color,rotation});
@@ -547,99 +445,21 @@ function ElevatedDistrict({ motion }: { motion:boolean }) {
       glow(arcPoint(a,UPPER_RADIUS-.27,3.45),[.065,4.6,.04],'#457d92',rot);
       add(arcPoint(a,UPPER_RADIUS,5.9),[.3,.21,2.1],'#5d7888',rot);
     }
-    // Raised technical promenade on the rear of the facility row; stair/elevator towers connect it to the street.
+    // Electrical risers take the power feed above the facility row.
     for(let i=0;i<5;i++){
       const a=zones[i].angle+.16;
       const rot:Vec3=[0,-a,0];
       add(arcPoint(a,18.85,1.86),[.66,3.85,.78],'#39566a',rot);
-      add(arcPoint(a,18.85,3.84),[.92,.19,1.04],'#8497a1',rot);
+      add(arcPoint(a,18.85,3.84),[.92,.19,1.04],'#8495a0',rot);
       glow(arcPoint(a,18.40,1.90),[.16,2.9,.035],'#6599ae',rot);
-    }
-    for(let i=0;i<72;i++){
-      const a=-1.62+(i+.5)/72*3.24;const rot:Vec3=[0,-a,0];
-      add(arcPoint(a,UPPER_RADIUS-.84,UPPER_Y+.11),[.065,.23,.06],'#92a3ac',rot);
-      if(i%3===0)glow(arcPoint(a,UPPER_RADIUS-.91,UPPER_Y-.14),[.36,.045,.04],'#5fc5e3',rot);
-      add(arcPoint(a,18.85-.44,3.93),[.045,.30,.045],'#7b939f',rot);
     }
     return {structures,lights};
   },[]);
   return <group>
-    <ArcStrip inner={UPPER_RADIUS-.91} outer={UPPER_RADIUS+.91} y={UPPER_Y} color="#334957" end={1.72}/>
-    <ArcStrip inner={UPPER_RADIUS-.91} outer={UPPER_RADIUS+.91} y={UPPER_Y-.31} color="#283e4c" end={1.72}/>
-    {[-1,1].map(side=><group key={side}>
-      <ArcWall radius={UPPER_RADIUS+side*.91} bottom={UPPER_Y-.31} top={UPPER_Y+.04} color="#597181" end={1.72}/>
-      <ArcStrip inner={UPPER_RADIUS+side*.76-.035} outer={UPPER_RADIUS+side*.76+.035} y={UPPER_Y+.035} color="#77cce3" glow end={1.72}/>
-      <ArcStrip inner={UPPER_RADIUS+side*.28-.028} outer={UPPER_RADIUS+side*.28+.028} y={UPPER_Y+.023} color="#99b2bd" end={1.72}/>
-    </group>)}
-    <ArcStrip inner={18.35} outer={19.35} y={3.78} color="#3b5364" end={1.52}/>
-    <ArcWall radius={18.35} bottom={3.61} top={3.78} color="#708897" end={1.52}/>
-    <ArcStrip inner={18.35} outer={18.39} y={4.08} color="#659eaf" end={1.52}/>
-    <ArcStrip inner={18.46} outer={18.50} y={3.81} color="#7bb6c4" glow end={1.52}/>
+    <ArcStrip inner={UPPER_RADIUS-.44} outer={UPPER_RADIUS+.44} y={UPPER_Y-.08} color="#203948" end={1.72}/>
+    <ArcWall radius={UPPER_RADIUS+.44} bottom={UPPER_Y-.31} top={UPPER_Y-.08} color="#42677c" end={1.72}/>
+    <ArcStrip inner={18.62} outer={19.03} y={3.78} color="#233b49" end={1.52}/>
     <DetailInstances items={structures}/><DetailInstances items={lights} glowing/>
-    <ElevatedShuttle motion={motion} phase={.26} color="#79e8ff"/><ElevatedShuttle motion={motion} phase={.74} color="#e5c68b"/>
-  </group>;
-}
-
-function TransitVehicle({ airborne, phase, color, motion, direction = 1, perimeterRadius }: { airborne: boolean; phase: number; color: string; motion: boolean; direction?: number; perimeterRadius?: number }) {
-  const vehicle=useRef<THREE.Group>(null), elapsed=useRef(0);
-  useFrame((_,dt)=>{
-    if(!vehicle.current)return;
-    if(motion)elapsed.current+=Math.min(dt,.1);
-    const u=(phase+elapsed.current*(perimeterRadius? .55/perimeterRadius : airborne?.035:.055))%1;
-    // Extended open route, not a loop around the visible map. Hide outside the portals.
-    const routeEnd=perimeterRadius?1.68:ARC_END;
-    const limit=routeEnd+.32;
-    const angle=direction*(-limit+u*limit*2);
-    const radius=perimeterRadius?perimeterRadius+direction*.72:airborne?ROAD_RADIUS-2.7:ROAD_RADIUS+direction*.61;
-    vehicle.current.position.set(...arcPoint(angle,radius,perimeterRadius?.14:airborne?4.9:.27));
-    vehicle.current.rotation.y=Math.atan2(direction*Math.cos(angle),direction*Math.sin(angle));
-    const edge=Math.abs(angle);
-    const scale=1-THREE.MathUtils.smoothstep(edge,routeEnd-.025,routeEnd+.17);
-    vehicle.current.scale.setScalar(Math.max(.001,scale));
-    vehicle.current.visible=edge<routeEnd+.17;
-  });
-  return <group ref={vehicle}>
-    {perimeterRadius?<group>
-      <mesh position={[0,.06,0]} scale={[.34,.13,.64]}><sphereGeometry args={[1,12,8]}/><meshStandardMaterial color="#30485c" metalness={.65} roughness={.29}/></mesh>
-      <mesh position={[0,.19,-.035]} scale={[.24,.16,.34]}><sphereGeometry args={[1,12,8]}/><meshStandardMaterial color="#698c9e" metalness={.52} roughness={.23}/></mesh>
-      {[-1,1].map(side=><group key={side}>
-        <Block position={[side*.28,.005,0]} size={[.065,.07,.75]} color={color} light/>
-        <Block position={[side*.21,.10,.48]} size={[.13,.055,.07]} color="#d9f7ff" light/>
-        <Block position={[side*.23,.085,-.48]} size={[.12,.045,.055]} color="#ff806e" light/>
-      </group>)}
-    </group>:airborne?<group>
-      <mesh scale={[.39,.105,.65]}><sphereGeometry args={[1,20,12]}/><meshStandardMaterial color="#354c60" metalness={.65} roughness={.27}/></mesh>
-      <mesh position={[0,.09,.08]} scale={[.19,.10,.29]}><sphereGeometry args={[1,16,10]}/><meshStandardMaterial color="#789bad" metalness={.65} roughness={.19}/></mesh>
-      {[-1,1].map(side=><group key={side}><Block position={[side*.38,-.015,-.09]} size={[.26,.07,.67]} color="#3e5667"/><Block position={[side*.5,-.02,-.12]} size={[.036,.042,.56]} color={color} light/></group>)}
-    </group>:<group>
-      {/* Low streamlined fairing, larger luminous hubless wheels, integrated saddle and cockpit. */}
-      {[-.29,.29].map(z=><group key={z}>
-        <Cylinder position={[0,0,z]} radius={.205} height={.13} color="#101d29" sides={28} rotation={[0,0,Math.PI/2]}/>
-        {[-1,1].map(side=><mesh key={side} position={[side*.073,0,z]} rotation={[0,Math.PI/2,0]}><torusGeometry args={[.164,.024,8,32]}/><meshStandardMaterial color={color} emissive={color} emissiveIntensity={3.1} toneMapped={false}/></mesh>)}
-        <mesh position={[0,.04,z]} scale={[.108,.16,.22]}><sphereGeometry args={[1,16,10]}/><meshStandardMaterial color="#253747" metalness={.6} roughness={.26}/></mesh>
-      </group>)}
-      <mesh position={[0,.085,0]} scale={[.135,.12,.41]}><sphereGeometry args={[1,24,12]}/><meshStandardMaterial color="#243645" metalness={.72} roughness={.24}/></mesh>
-      <mesh position={[0,.18,.025]} scale={[.10,.105,.21]}><sphereGeometry args={[1,16,10]}/><meshStandardMaterial color="#415c70" metalness={.55} roughness={.22}/></mesh>
-      {[-1,1].map(side=><group key={side}><Rail from={[side*.112,.1,-.27]} to={[side*.118,.13,.29]} width={.025} color={color} light/><Block position={[side*.1,.12,-.08]} size={[.035,.055,.19]} color="#7794a5"/></group>)}
-      <Block position={[0,.13,.42]} size={[.11,.045,.055]} color="#c1f4ff" light/>
-    </group>}
-    <Block position={[0,.025,perimeterRadius?-.60:airborne?-.64:-.45]} size={[airborne?.29:.105,.045,.09]} color={color} light/>
-    {motion && !perimeterRadius && Array.from({length:5},(_,i)=><mesh key={i} position={[0,.02,-.68-i*.25]}><boxGeometry args={[.045-i*.005,.024,.23]}/><meshBasicMaterial color={color} transparent opacity={.8-i*.13} toneMapped={false} depthWrite={false}/></mesh>)}
-  </group>;
-}
-
-function AirRoutes({ motion }: { motion: boolean }) {
-  return <group>
-    <ArcStrip inner={ROAD_RADIUS-2.74} outer={ROAD_RADIUS-2.72} y={4.9} color="#315a70" end={ARC_END} />
-    <TransitVehicle airborne phase={.16} color="#54dcff" motion={motion}/>
-    <TransitVehicle airborne phase={.69} color="#b8dcff" motion={motion} direction={-1}/>
-    <TransitVehicle airborne={false} phase={.08} color="#76eaff" motion={motion}/>
-    <TransitVehicle airborne={false} phase={.45} color="#ffb95d" motion={motion} direction={-1}/>
-    <TransitVehicle airborne={false} phase={.79} color="#65e9d6" motion={motion}/>
-    <TransitVehicle airborne={false} perimeterRadius={24} phase={.22} color="#72d8ff" motion={motion}/>
-    <TransitVehicle airborne={false} perimeterRadius={24} phase={.64} color="#e9b77f" motion={motion} direction={-1}/>
-    <TransitVehicle airborne={false} perimeterRadius={35.7} phase={.35} color="#b9a3ff" motion={motion}/>
-    <TransitVehicle airborne={false} perimeterRadius={46.7} phase={.61} color="#77e6c5" motion={motion} direction={-1}/>
   </group>;
 }
 
@@ -865,15 +685,11 @@ function CampusScene({ selected, topic, onSelect, onTopic, motion, reset, intro,
     <fog attach="fog" args={['#142634', 34, 96]} />
     <ArchitecturalSky />
     <CityLighting />
-    <Base motion={motion} />
+    <Base />
     <MetropolitanBackdrop />
-    <CampusCitizens motion={motion}/>
-    <NeonStreetlights />
-    <CampusStreetLife motion={motion}/>
-    <PavementLightPools />
-    <ElevatedDistrict motion={motion}/>
-    <AirRoutes motion={motion} />
-    {zones.map(zone => <LinkTrack key={zone.id} zone={zone} motion={motion} />)}
+    <ElevatedDistrict />
+    <CampusEnergy motion={motion} focused={selected!==null}/>
+    {zones.map(zone => <FacilityEnergyLink key={zone.id} angle={zone.angle} color={zone.color} motion={motion}/>)}
     {zones.map(zone => <group key={zone.id} position={zone.position} rotation={[0,-zone.angle,0]} onPointerOver={event => { event.stopPropagation(); gl.domElement.style.cursor = 'pointer'; }} onPointerOut={() => { gl.domElement.style.cursor = ''; }} onClick={event => { event.stopPropagation(); if (!intro && event.delta < 5 && selected!==zone.id) onSelect(zone.id); }}>
       {!selected && !intro && <Html position={[0,labelHeights[zone.id],.85]} center zIndexRange={[5,1]} style={{pointerEvents:'auto'}}><button type="button" aria-label={`Explore ${zone.name}`} title={zone.name} className="campus-map-label" onPointerDown={event=>event.stopPropagation()} onClick={event=>{event.stopPropagation();onSelect(zone.id);}}><span>{zone.label}</span><strong>{facilityNames[zone.id]}</strong></button></Html>}
       <ContactFootprint position={[0,-.065,0]} size={[5.65,4.75]}/>
@@ -1127,14 +943,14 @@ export default function EngineeringCampus() {
       <div className="campus-topfade" aria-hidden="true" />
       {intro&&motion&&<div className="campus-cinematic-overlay"><div><p>TYMUR ABBASOV / SOFTWARE &amp; AI ENGINEERING</p><h3>Enter the system.</h3><span>An interactive engineering portfolio. Five facilities, one connected world.</span></div><button type="button" onClick={()=>{stopIntro();requestAnimationFrame(()=>mapRef.current?.focus({preventScroll:true}));}}>Skip intro →</button></div>}
       <header className="campus-header">
-        <div className="campus-heading"><p className="campus-kicker">INTERACTIVE ENGINEERING PORTFOLIO</p>{active?<h2>Engineering <span>avenue.</span></h2>:<h1>Tymur <span>Abbasov.</span></h1>}<p className="campus-role">Full-stack engineer · Local AI &amp; LLM systems</p>{!active&&<p className="campus-intro-copy">Full-stack software, private AI systems and reliable infrastructure. Explore my work through five connected facilities.</p>}
+        <div className="campus-heading"><p className="campus-kicker">INTERACTIVE ENGINEERING PORTFOLIO</p>{active?<h2>Engineering <span>avenue.</span></h2>:<h1>Tymur <span>Abbasov.</span></h1>}<p className="campus-role">Full-stack engineer · Local AI &amp; LLM systems</p>{!active&&<p className="campus-intro-copy">Full-stack software, private AI systems and reliable infrastructure. Explore five engineering facilities connected by a luminous energy network.</p>}
           <div className="campus-arrival-links" aria-label="Professional links">
             <a className="campus-classic-link" href={contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
             <a className="campus-classic-link" href={contact.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
             <a className="campus-classic-link" href="#services">Services ↓</a>
             <a className="campus-classic-link" href="./classic/">Classic portfolio ↗</a>
           </div>
-          <div className="campus-stage-label"><span aria-hidden="true"/><div>{active?`${interior?'INTERIOR':'FACILITY'} ${active.label} / ${active.name}`:'DISTRICT OVERVIEW / MULTILEVEL TRANSIT'}</div></div>
+          <div className="campus-stage-label"><span aria-hidden="true"/><div>{active?`${interior?'INTERIOR':'FACILITY'} ${active.label} / ${active.name}`:'DISTRICT OVERVIEW / QUANTUM ENERGY NETWORK'}</div></div>
         </div>
         <div className="campus-controls" aria-label="Scene settings">
           <button type="button" ref={mapRef} onClick={returnToMap}>⌖ City overview</button>
@@ -1143,7 +959,7 @@ export default function EngineeringCampus() {
           <button type="button" onClick={() => {setIntro(false);setMotion(value => !value);}} aria-pressed={motion}>Motion {motion ? 'on' : 'off'}</button>
         </div>
       </header>
-      {show3D&&!ready&&<div className={`campus-loading${slowStart?' campus-loading-slow':''}`}><div className="campus-loading-content"><div className="campus-loading-emblem" aria-hidden="true"><i/><i/><i/></div><p>TYMUR ABBASOV / INTERACTIVE PORTFOLIO</p><h3>Initializing the city.</h3><div className="campus-loading-track" aria-hidden="true"><span/></div><span role="status">{slowStart?'The renderer is taking longer than expected. You can continue exploring or switch off 3D.':'Preparing 3D geometry, materials and lighting…'}</span><button type="button" onClick={onUnavailable}>Explore without 3D →</button></div></div>}
+      {show3D&&!ready&&<div className={`campus-loading${slowStart?' campus-loading-slow':''}`}><div className="campus-loading-content"><div className="campus-loading-emblem" aria-hidden="true"><i/><i/><i/></div><p>TYMUR ABBASOV / INTERACTIVE PORTFOLIO</p><h3>Initializing the energy network.</h3><div className="campus-loading-track" aria-hidden="true"><span/></div><span role="status">{slowStart?'The renderer is taking longer than expected. You can continue exploring or switch off 3D.':'Preparing 3D geometry, materials and energy channels…'}</span><button type="button" onClick={onUnavailable}>Explore without 3D →</button></div></div>}
       <div className="campus-hint">{interior?'Select a workstation · Drag to orbit · Scroll to zoom':active?'Choose a light marker · Enter facility to explore inside':'Drag to orbit · Right-drag to move · Scroll to zoom · Click a building'}<span className="campus-key-hint"> · Focus scene: WASD / arrows to move</span></div>
     </div>
     {active&&dossier&&activeTopic&&<aside className="campus-spatial-info" style={{'--zone-color':active.color} as CSSProperties} aria-label={`${active.name} information`}>

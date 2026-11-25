@@ -1,6 +1,6 @@
 # Development Progress
 
-> **Last updated:** 2026-11-25 · street-life iteration based on `ef08e45` · candidate, not accepted.
+> **Last updated:** 2026-11-25 · energy-network iteration based on `ab21902` · candidate, not accepted.
 
 ## Current Snapshot
 
@@ -10,12 +10,13 @@
 - `dadb251`: targeted fixes for seven React Hooks immutability lint diagnostics in CampusVisuals and EngineeringCampus. Diff inspected. Local agent reported clean lint and successful build on its checkout; no independent browser verification.
 - `336a574` / `f5b964f`: production campus entry, mobile navigation and reduced-motion improvements, browser smoke tests.
 - `d1bdc39` / `ef08e45`: city-first home, classic route, service cards, hidden document scrollbar with scrolling retained.
-- This candidate: original low-poly visor/coat NPCs (50 desktop / 20 narrow), four outer-road hovercars on existing lanes, additional batched streetlights and light pools, two small shops and a shallow plaza fountain. Optional project walkthrough explicitly uses scripted example data and no longer forces entry into the building. Added a walkthrough smoke test.
+- `ab21902`: street-life experiment and clearer optional project walkthrough. Owner rejected the urban simulation aesthetic; the walkthrough remains.
+- This candidate: remove all exterior NPCs, vehicles, elevated shuttles, cafes and fountain from the active campus. Reuse existing facility layout and elevated supports for original half-dome fusion core, shader-driven energy rings, radial facility feeds and perimeter relays. No external assets or new dependencies.
 
 ### Verification and blockers
 - No lint/build/browser run on this candidate SHA yet. Run the README commands before acceptance. The available remote repository connection does not provide a local dependency installation or browser runtime.
 - Prior build warning: oversized JavaScript chunk (~1.35 MB before this candidate). Measure new build before claiming any improvement.
-- Actual WebGL rendering, animation, camera controls, interior navigation, shop placement, pedestrian/vehicle separation and responsive visual quality still require manual browser checks. Measure FPS on the same hardware before and after; no external assets or new shadow-casting lights were added.
+- Actual WebGL rendering, animation, camera controls, interior navigation, energy channel visibility, core silhouette, shader compilation and animation and responsive visual quality still require manual browser checks. Measure FPS on the same hardware before and after; no external assets or new shadow-casting lights were added.
 - GitHub and previously supplied public LinkedIn are configured. Email is omitted until the owner approves a public address.
 - `opencode.json.bak` is tracked. No obvious secret field was found in this review; keep it out of deployment and review local configuration separately.
 
