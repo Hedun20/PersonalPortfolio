@@ -29,7 +29,7 @@ function CubeRainLayer({count,near,motion,focused}:{count:number;near:boolean;mo
   const transform=useMemo(()=>new THREE.Object3D(),[]);
   const point=useMemo(()=>new THREE.Vector3(),[]);
   const elapsed=useRef(0);
-  const frameGeometry=useMemo(makeFrame,[]);
+  const frameGeometry=useMemo(()=>makeFrame(),[]);
   useEffect(()=>()=>frameGeometry.dispose(),[frameGeometry]);
   const particles=useMemo(()=>Array.from({length:count},(_,i)=>({
     angle:-1.7+random(i*13+1)*3.4,

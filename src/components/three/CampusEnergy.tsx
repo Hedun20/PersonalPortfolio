@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { FusionReactor } from './FusionReactor';
-import { EnergyBeam, energyPoint } from './CampusBeams';
+import { EnergyBeam } from './CampusBeams';
+import { energyPoint } from './campusEnergyGeometry';
 import { ArchitecturalFinish } from './CampusMaterials';
 
 const CENTER_Z = 4;

@@ -47,11 +47,19 @@ function ArtReady({ onReady }: { onReady: () => void }) {
   return null;
 }
 
+// DOM marker positions are a renderer side effect; keep mutation out of props.
+function setMarkerPosition(element: HTMLButtonElement, x: number, y: number, visible: boolean) {
+  element.style.visibility = visible ? 'visible' : 'hidden';
+  element.style.left = `${(x+1)*50}%`;
+  element.style.top = `${(1-y)*50}%`;
+}
+
 function AnimatedArt({ variant, interaction }: { variant: Variant; interaction?: SceneInteraction }) {
   const group = useRef<Group>(null);
   const core = useRef<Group>(null);
   const position = useRef(new Vector3());
   const projected = useRef(new Vector3());
+  const initialized = useRef(false);
   const count = interaction?.count ?? 0;
   const rails = useMemo<Vec[]>(()=>{
     if (!count) return [];
@@ -74,7 +82,8 @@ function AnimatedArt({ variant, interaction }: { variant: Variant; interaction?:
     g.position.y = 0;
     const elapsed = clock.elapsedTime;
     if (interaction) {
-      g.rotation.y = MathUtils.damp(g.rotation.y, interaction.rotation.current + Math.sin(elapsed*.4)*.055, 9, dt);
+      if (!initialized.current) { g.rotation.y=interaction.rotation.current; initialized.current=true; }
+      g.rotation.y = MathUtils.damp(g.rotation.y, interaction.rotation.current + Math.sin(elapsed*.4)*.22, 9, dt);
       core.current.rotation.y = 0;
       core.current.rotation.x = .12 + Math.sin(elapsed*.35)*.08;
       g.updateMatrixWorld(true);
@@ -87,9 +96,7 @@ function AnimatedArt({ variant, interaction }: { variant: Variant; interaction?:
         projected.current.copy(position.current).project(camera);
         const p = projected.current;
         const front = position.current.z > -.2 && Math.abs(p.x)<.97 && Math.abs(p.y)<.96;
-        element.style.visibility = front ? 'visible' : 'hidden';
-        element.style.left = `${(p.x+1)*50}%`;
-        element.style.top = `${(1-p.y)*50}%`;
+        setMarkerPosition(element,p.x,p.y,front);
       }
     } else {
       g.rotation.y += dt * .28;

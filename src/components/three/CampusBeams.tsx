@@ -4,9 +4,6 @@ import * as THREE from 'three';
 
 type Vec3=[number,number,number];
 const NO_RAYCAST=()=>null;
-export function energyPoint(angle:number,radius:number,y:number):Vec3 {
-  return [Math.sin(angle)*radius,y,4-Math.cos(angle)*radius];
-}
 
 const vertexShader=`
 varying vec2 vUv;
