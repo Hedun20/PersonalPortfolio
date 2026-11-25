@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { SECTIONS, SECTION_LABELS } from '../../data/sections';
 
-const navItems = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Expertise', href: '#expertise' },
-  { label: 'Architecture', href: '#architecture' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Contact', href: '#contact' },
-];
+// Derived from SECTIONS so a section can never be added to the page without
+// also appearing in the nav (and vice versa). Tech Stack was missing here.
+const navItems = SECTIONS.map((id) => ({
+  href: `#${id}`,
+  label: SECTION_LABELS[id],
+}));
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);

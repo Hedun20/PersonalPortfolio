@@ -1,6 +1,14 @@
 import { motion } from 'framer-motion';
 import { easeOut } from 'framer-motion';
 import { Mail, GitFork, Link, MapPin, ArrowUpRight } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { contact, contactLinks } from '../../data/contact';
+
+const linkIcons: Record<(typeof contactLinks)[number]['key'], LucideIcon> = {
+  email: Mail,
+  github: GitFork,
+  linkedin: Link,
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -20,7 +28,7 @@ const itemVariants = {
 };
 
 interface ContactLinkProps {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   label: string;
   href: string;
   description: string;
@@ -93,34 +101,31 @@ export default function Contact() {
 
         {/* Contact links grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
-          <ContactLink
-            icon={Mail}
-            label="Email"
-            href="mailto:timur@example.com"
-            description="timur@example.com"
-            index={0}
-          />
-          <ContactLink
-            icon={GitFork}
-            label="GitHub"
-            href="https://github.com/timur"
-            description="Open-source projects and code samples"
-            index={1}
-          />
-          <ContactLink
-            icon={Link}
-            label="LinkedIn"
-            href="https://linkedin.com/in/timur"
-            description="Professional network and updates"
-            index={2}
-          />
-          <ContactLink
-            icon={MapPin}
-            label="Location"
-            href="#"
-            description="Available for remote work worldwide"
-            index={3}
-          />
+          {contactLinks.map((link, index) => (
+            <ContactLink
+              key={link.key}
+              icon={linkIcons[link.key]}
+              label={link.label}
+              href={link.href}
+              description={link.description}
+              index={index}
+            />
+          ))}
+
+          {/* Location is information, not a link, so it is not an anchor. */}
+          <div className="glass-card p-6 sm:p-8 flex items-start gap-5">
+            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-accent-primary/[0.08] border border-border-accent/20 flex items-center justify-center">
+              <MapPin className="h-5 w-5 text-accent-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-heading text-base font-semibold text-text-main mb-1">
+                {contact.locationLabel}
+              </h3>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {contact.location}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* CTA banner */}
@@ -139,7 +144,7 @@ export default function Contact() {
             enterprise-grade architecture — let&apos;s turn your vision into reality.
           </p>
           <a
-            href="mailto:timur@example.com"
+            href={`mailto:${contact.email}`}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide bg-accent-primary text-bg-primary font-semibold hover:bg-sky-300 transition-all duration-300 shadow-lg shadow-accent-primary/20"
           >
             <Mail className="h-4 w-4" />

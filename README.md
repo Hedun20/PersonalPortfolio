@@ -1,75 +1,65 @@
-# React + TypeScript + Vite
+# Personal Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A single-page portfolio site built with React, Vite and Three.js. The visual identity is
+"engineering intelligence": a dark, glassy interface with a neural-network hero canvas,
+an animated nuclear reactor and an Inkling character that reacts to the reader.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 18 or newer
 
-## React Compiler
+## Getting started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+The dev server runs at <http://localhost:5173>.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Common commands
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server with hot reload |
+| `npm run build` | Type-check (`tsc -b`) then production build |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | ESLint over `src/` and `vite.config.ts` |
+
+## Project structure
 
 ```
+src/
+  App.tsx              Section order for the page
+  index.css            Design tokens (Tailwind @theme) + custom utilities
+  components/
+    layout/            Navbar, Footer, shared section containers
+    sections/          One component per page section (Hero, About, Contact, ...)
+    three/             Three.js / threejs-react scenes
+  data/
+    sections.ts        Section ids + labels (single source of truth for the nav)
+    contact.ts         Contact links and location
+  preview/             Standalone scenes used while iterating on 3D work
+public/
+  favicon.svg          Browser tab icon
+```
+
+Two conventions are worth knowing before adding a section:
+
+- **Section ids live in `src/data/sections.ts`.** `SECTIONS` and `SECTION_LABELS`
+  drive the navbar, so a new section needs an entry there or it will not be
+  reachable from the nav. The nav links to `#<id>`, which means the section
+  component must render an element with `id="<id>"`.
+- **Contact details live in `src/data/contact.ts`.** The contact section renders
+  from that file, so links and labels are edited in one place.
+
+## Notes
+
+- The 3D scenes are the heaviest part of the dependency tree (`three`,
+  `threejs-react`, `bloom`, `postprocessing`). Anything that imports them ends up
+  in the main bundle, so keep new scenes out of components the page loads on
+  first paint unless they are actually rendered.
+- `src/preview/` and the `preview-*.html` files are scratch scenes for iterating
+  on 3D work. They are not linked from the site.
+- The contact links and location in `src/data/contact.ts` are placeholders
+  (`TODO` markers) and need to be filled in before publishing.
