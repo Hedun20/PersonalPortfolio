@@ -73,6 +73,7 @@ function ringGeometry(radius: number, width: number, height: number, end: number
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   geometry.setIndex(indices);
+  geometry.computeVertexNormals();
   return geometry;
 }
 
@@ -89,6 +90,7 @@ function radialGeometry(angle: number, start: number, end: number, width: number
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute([0,0,0,1,1,0,1,1], 2));
   geometry.setIndex([0,1,2,1,3,2]);
+  geometry.computeVertexNormals();
   return geometry;
 }
 
@@ -117,11 +119,19 @@ function EnergyRibbon({ geometry, color, speed, phase, packets, motion }: {
   </mesh>;
 }
 
+function curvedRail(radius:number, height:number, end:number, thickness:number) {
+  const points=Array.from({length:Math.ceil(end*24)+1},(_,i)=>{
+    const angle=-end+2*end*i/Math.ceil(end*24);
+    return new THREE.Vector3(Math.sin(angle)*radius,height,CENTER_Z-Math.cos(angle)*radius);
+  });
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),end>3?160:96,thickness,6,false);
+}
+
 function RingChannel({ channel, motion }: { channel: Channel; motion: boolean }) {
   const { radius, width, height, end, color, speed, phase, packets } = channel;
   const geometry = useMemo(() => ringGeometry(radius, width, height+.055, end), [radius, width, height, end]);
   const housing = useMemo(() => ringGeometry(radius,width+.28,height+.012,end),[radius,width,height,end]);
-  const rails = useMemo(()=>[-1,1].map(side=>ringGeometry(radius+side*(width*.5+.08),.075,height+.043,end)),[radius,width,height,end]);
+  const rails = useMemo(()=>[-1,1].map(side=>curvedRail(radius+side*(width*.5+.08),height+.045,end,.055)),[radius,width,height,end]);
   useEffect(()=>()=>{housing.dispose();rails.forEach(g=>g.dispose());},[housing,rails]);
   return <group>
     <mesh geometry={housing} raycast={NO_RAYCAST}><meshStandardMaterial color="#263b4a" metalness={.78} roughness={.38} side={THREE.DoubleSide}/></mesh>
@@ -130,16 +140,27 @@ function RingChannel({ channel, motion }: { channel: Channel; motion: boolean })
   </group>;
 }
 
-export function FacilityEnergyLink({ angle, color, motion }: { angle: number; color: string; motion: boolean }) {
-  const geometry = useMemo(() => radialGeometry(angle, 4.18, 13.9, .74, .17), [angle]);
-  const housing = useMemo(() => radialGeometry(angle, 4.18, 13.9, 1.07, .13), [angle]);
-  const left = useMemo(() => radialGeometry(angle-.001, 4.18, 13.9, 1.00, .15), [angle]);
-  useEffect(()=>()=>{housing.dispose();left.dispose();},[housing,left]);
+function RadialConduit({angle,start,end,width,height,color,motion,speed,packets}:{
+  angle:number;start:number;end:number;width:number;height:number;color:string;motion:boolean;speed:number;packets:number;
+}) {
+  const geometry=useMemo(()=>radialGeometry(angle,start,end,width,height+.067),[angle,start,end,width,height]);
+  const housing=useMemo(()=>radialGeometry(angle,start,end,width+.28,height+.015),[angle,start,end,width,height]);
+  useEffect(()=>()=>housing.dispose(),[housing]);
+  const middle=(start+end)/2;
   return <group>
-    <mesh geometry={housing} raycast={NO_RAYCAST}><ArchitecturalFinish color="#1b303d" finish="titanium" detail={false}/></mesh>
-    <mesh geometry={left} raycast={NO_RAYCAST}><meshStandardMaterial color="#3e5868" metalness={.72} roughness={.38} side={THREE.DoubleSide}/></mesh>
-    <EnergyRibbon geometry={geometry} color={color} speed={.88} phase={angle} packets={3} motion={motion}/>
+    <mesh geometry={housing} raycast={NO_RAYCAST}><ArchitecturalFinish color="#263b4a" finish="titanium" detail={false}/></mesh>
+    <group position={[Math.sin(angle)*middle,height+.04,CENTER_Z-Math.cos(angle)*middle]} rotation={[0,-angle,0]}>
+      {[-1,1].map(side=><mesh key={side} position={[side*(width*.5+.08),0,0]} raycast={NO_RAYCAST}>
+        <boxGeometry args={[.09,.11,end-start]}/>
+        <meshStandardMaterial color="#718a9b" metalness={.83} roughness={.28} emissive={color} emissiveIntensity={.11}/>
+      </mesh>)}
+    </group>
+    <EnergyRibbon geometry={geometry} color={color} speed={speed} phase={angle} packets={packets} motion={motion}/>
   </group>;
+}
+
+export function FacilityEnergyLink({ angle, color, motion }: { angle: number; color: string; motion: boolean }) {
+  return <RadialConduit angle={angle} start={4.18} end={13.9} width={.74} height={.13} color={color} speed={.88} packets={3} motion={motion}/>;
 }
 
 const channels: Channel[] = [
@@ -166,6 +187,5 @@ export function CampusEnergy({ motion, focused }: { motion: boolean; focused: bo
 
 function PeripheralFeed({ angle, motion, end }: { angle: number; motion: boolean; end: number }) {
   // The previous road-spoke corridors are clear of tower footprints; use them as energy feeds.
-  const geometry = useMemo(() => radialGeometry(angle, 22, end, .48, -.045), [angle,end]);
-  return <EnergyRibbon geometry={geometry} color="#6bbfff" speed={.6} phase={angle} packets={5} motion={motion}/>;
+  return <RadialConduit angle={angle} start={22} end={end} width={.48} height={-.045} color="#6bbfff" speed={.6} packets={5} motion={motion}/>;
 }

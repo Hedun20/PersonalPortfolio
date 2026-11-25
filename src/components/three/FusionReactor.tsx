@@ -64,7 +64,7 @@ function makeReactor(narrow:boolean) {
   for(let i=0;i<count;i++){
     const angle=i*TAU/count, span=TAU/count;
     // The visible wedge is aligned with the coil at angle; gaps reveal the darker foundation.
-    const start=Math.PI/2-angle-span*.42;
+    const start=angle-Math.PI/2-span*.42;
     add('alloy',sector(3.20,4.02,.18,start,span*.84),[0,.54,0]);
     add('edge',sector(3.36,3.93,.045,start+.025,span*.84-.05),[0,.66,0]);
     add('dark',sector(2.70,3.14,.44,start+.022,span*.84-.044),[0,.72,0]);
