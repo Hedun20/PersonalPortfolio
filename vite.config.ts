@@ -9,7 +9,8 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
-        campus: resolve(import.meta.dirname, 'preview-campus.html'),
+        classic: resolve(import.meta.dirname, 'classic/index.html'),
+        campusPreview: resolve(import.meta.dirname, 'preview-campus.html'),
       },
     },
   },

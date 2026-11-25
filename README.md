@@ -1,8 +1,6 @@
 # Personal Portfolio
 
-A single-page portfolio site built with React, Vite and Three.js. The visual identity is
-"engineering intelligence": a dark, glassy interface with a neural-network hero canvas,
-an animated nuclear reactor and an Inkling character that reacts to the reader.
+An interactive 3D engineering campus built with React, Vite and Three.js. The main experience presents five engineering facilities, professional links and services; the classic portfolio is a separate accessible alternative.
 
 ## Prerequisites
 
@@ -16,8 +14,9 @@ npm run dev
 ```
 
 The dev server runs at <http://localhost:5173>.
-The interactive campus is available from the hero link or at `/preview-campus.html`.
-The classic portfolio and campus are both production build entries.
+The city is the home page (`/`); the classic portfolio is at `/classic/`.
+The legacy `/preview-campus.html` path still opens the same campus experience.
+All three HTML entry points are included in the production build.
 
 ## Common commands
 
@@ -61,10 +60,10 @@ Two conventions are worth knowing before adding a section:
   `threejs-react`, `bloom`, `postprocessing`). Anything that imports them ends up
   in the main bundle, so keep new scenes out of components the page loads on
   first paint unless they are actually rendered.
-- `preview-campus.html` is the interactive campus entry linked from the classic hero.
+- `index.html` and `preview-campus.html` share the city entry component.
   `preview-inkling.html` remains a development-only scratch preview.
-- The contact links and location in `src/data/contact.ts` are placeholders
-  (`TODO` markers) and need to be filled in before publishing.
+- Public GitHub and LinkedIn links are centralized in `src/data/contact.ts`.
+  Email is intentionally omitted until the owner approves a public address.
 
 
 ## Browser smoke tests

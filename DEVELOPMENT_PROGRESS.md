@@ -1,6 +1,6 @@
 # Development Progress
 
-> **Last updated:** 2026-11-25 · integration review based on `dadb251` · candidate, not accepted.
+> **Last updated:** 2026-11-25 · city-first iteration based on `f5b964f` · candidate, not accepted.
 
 ## Current Snapshot
 
@@ -8,13 +8,14 @@
 - `eff47d8`: shared contact and navigation data, dead link fix, README.
 - `6900550`: campus preview and five facilities, interior/workflow interactions, 3D controls.
 - `dadb251`: targeted fixes for seven React Hooks immutability lint diagnostics in CampusVisuals and EngineeringCampus. Diff inspected. Local agent reported clean lint and successful build on its checkout; no independent browser verification.
-- This candidate: expose the existing campus from the classic hero, include its HTML entry in Vite production build, retain classic anchor links, improve mobile navigation and reduced-motion behavior, add production smoke tests.
+- `336a574` / `f5b964f`: production campus entry, mobile navigation and reduced-motion improvements, browser smoke tests.
+- This candidate: campus at `/`, classic at `/classic/`, on-demand cinematic mode, professional links, four service areas, updated navigation tests. Existing 3D geometry preserved.
 
 ### Verification and blockers
 - No lint/build/browser run on this candidate SHA yet. Run the README commands before acceptance. The available remote repository connection does not provide a local dependency installation or browser runtime.
 - Prior build warning: oversized JavaScript chunk (~1.35 MB before this candidate). Measure new build before claiming any improvement.
 - Actual WebGL rendering, animation, camera controls, interior navigation, and responsive visual quality still require manual browser checks.
-- Contact email/LinkedIn values are placeholders. Obtain owner-confirmed public contact details before publication.
+- GitHub and previously supplied public LinkedIn are configured. Email is omitted until the owner approves a public address.
 - `opencode.json.bak` is tracked. No obvious secret field was found in this review; keep it out of deployment and review local configuration separately.
 
 ### Exact next step

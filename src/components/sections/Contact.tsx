@@ -144,11 +144,13 @@ export default function Contact() {
             enterprise-grade architecture — let&apos;s turn your vision into reality.
           </p>
           <a
-            href={`mailto:${contact.email}`}
+            href={contact.email ? `mailto:${contact.email}` : contact.linkedin}
+            target={contact.email ? undefined : '_blank'}
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide bg-accent-primary text-bg-primary font-semibold hover:bg-sky-300 transition-all duration-300 shadow-lg shadow-accent-primary/20"
           >
             <Mail className="h-4 w-4" />
-            Send a Message
+            {contact.email ? 'Send a Message' : 'Connect on LinkedIn'}
           </a>
         </motion.div>
       </div>

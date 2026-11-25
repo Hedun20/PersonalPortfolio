@@ -15,6 +15,11 @@ Transform the PersonalPortfolio project into an immersive 3D engineering portfol
 4. **Command Center** — DevOps, CI/CD, cloud infrastructure
 5. **Research Lab** — Publications, experiments, technical writing
 
+## Entry points and professional profile
+- `/`: interactive campus as the primary experience (Explore by default; Cinematic on request).
+- `/classic/`: traditional portfolio for quick review or as an alternative to WebGL.
+- Compact public GitHub and LinkedIn links, plus a services section below the campus. Do not invent credentials, outcomes or private contact details.
+
 ## Modes
 1. **Cinematic** — Full-screen 3D walkthrough with scroll-driven transitions
 2. **Explore** — Interactive 3D scene with clickable zone nodes

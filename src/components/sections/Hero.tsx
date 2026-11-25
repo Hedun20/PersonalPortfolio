@@ -84,7 +84,7 @@ export default function Hero() {
               Explore My Work
             </a>
             <a
-              href="./preview-campus.html"
+              href="../"
               className="px-8 py-3.5 rounded-lg font-heading text-sm tracking-wide border border-border-accent/50 text-text-main hover:border-accent-primary/60 hover:bg-white/[0.03] transition-all duration-300"
             >
               Explore 3D campus

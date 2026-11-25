@@ -9,6 +9,7 @@ import { ArchitecturalSlab, FacilityArchitecture } from './CampusArchitecture';
 import { ArchitecturalSky, CityLighting, PavementLightPools } from './CampusVisuals';
 import { CampusProjectDemo, WorkflowSignal } from './CampusProjectDemo';
 import { CampusCitizens } from './CampusCitizens';
+import { contact } from '../../data/contact';
 import './EngineeringCampus.css';
 
 type Vec3 = [number, number, number];
@@ -1075,8 +1076,6 @@ export default function EngineeringCampus() {
   const onSceneError=useCallback(()=>{setSceneFailed(true);onUnavailable();},[onUnavailable]);
   function enable3D(){setSceneFailed(false);setSlowStart(false);setReady(false);setShow3D(true);}
   const [demoOpen,setDemoOpen]=useState(false);
-  const sectionRef=useRef<HTMLElement>(null);
-  const introSeen=useRef(false);
   const [motion, setMotion] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1090,24 +1089,14 @@ export default function EngineeringCampus() {
     const timer=window.setTimeout(()=>setSlowStart(true),12000);
     return ()=>window.clearTimeout(timer);
   },[show3D,ready]);
-  useEffect(()=>{
-    const element=sectionRef.current;
-    if(!ready||!show3D||!motion||introSeen.current||!element||selected||typeof IntersectionObserver==='undefined')return;
-    const observer=new IntersectionObserver(entries=>{
-      if(entries.some(entry=>entry.intersectionRatio>=.25)){
-        introSeen.current=true;setIntro(true);observer.disconnect();
-      }
-    },{threshold:.25});
-    observer.observe(element);return ()=>observer.disconnect();
-  },[motion,selected,ready,show3D]);
   const active = zones.find(zone => zone.id === selected);
   const dossier = active ? dossiers[active.id] : null;
   const activeTopic=active?topics[active.id][topic]:null;
   const activeIndex=active?zones.indexOf(active):-1;
   const mapRef=useRef<HTMLButtonElement>(null);
   const detailTitle=useRef<HTMLHeadingElement>(null);
-  function goTo(id:ZoneId){introSeen.current=true;setIntro(false);setDemoOpen(false);setInterior(false);setSelected(id);setTopic(1);setReset(value=>value+1);}
-  function returnToMap(){introSeen.current=true;setIntro(false);setDemoOpen(false);setInterior(false);setSelected(null);setReset(value=>value+1);mapRef.current?.focus({preventScroll:true});}
+  function goTo(id:ZoneId){setIntro(false);setDemoOpen(false);setInterior(false);setSelected(id);setTopic(1);setReset(value=>value+1);}
+  function returnToMap(){setIntro(false);setDemoOpen(false);setInterior(false);setSelected(null);setReset(value=>value+1);mapRef.current?.focus({preventScroll:true});}
   useEffect(()=>{if(selected)detailTitle.current?.focus({preventScroll:true});},[selected]);
   function playIntro(){if(!motion||!show3D||!ready)return;returnToMap();setIntro(true);}
   function stopIntro(){setIntro(false);}
@@ -1116,7 +1105,7 @@ export default function EngineeringCampus() {
   // Canvas renders fallback DOM children even when WebGL is available.
   // Never disable the scene from a fallback mount effect.
   const fallback = <p>3D rendering is unavailable. You can explore the projects below.</p>;
-  return <section ref={sectionRef} className={`campus campus-v6 campus-v7 campus-v13 ${intro&&motion?'campus-cinematic':''} ${active ? 'campus-entered' : ''} ${interior ? 'campus-interior' : ''}`} id="engineering-world" aria-label="Engineering world" onKeyDown={event=>{if(event.key==='Escape'){if(intro){event.preventDefault();stopIntro();}else if(selected){event.preventDefault();if(interior)toggleInterior();else returnToMap();}}}}>
+  return <section className={`campus campus-v6 campus-v7 campus-v13 ${intro&&motion?'campus-cinematic':''} ${active ? 'campus-entered' : ''} ${interior ? 'campus-interior' : ''}`} id="engineering-world" aria-label="Engineering world" onKeyDown={event=>{if(event.key==='Escape'){if(intro){event.preventDefault();stopIntro();}else if(selected){event.preventDefault();if(interior)toggleInterior();else returnToMap();}}}}>
     <div className="campus-stage">
       <div className="campus-world-canvas">{show3D?<SceneBoundary fallback={fallback} onError={onSceneError}><Canvas camera={{ position: [0,27,27.5], fov: 44, near: 0.1, far: 240 }} dpr={[1, 1.25]} shadows gl={{ antialias: true }} fallback={fallback}>
         <CampusMaterialProvider>{interior&&active?<FacilityInterior key={active.id} zone={active} topic={topic} onTopic={selectTopic} motion={motion}/>:<CampusScene selected={selected} topic={topic} onSelect={goTo} onTopic={selectTopic} motion={motion} reset={reset} intro={intro&&motion} onIntroEnd={stopIntro}/>}</CampusMaterialProvider><SceneReady onReady={onReady}/>
@@ -1124,8 +1113,13 @@ export default function EngineeringCampus() {
       <div className="campus-topfade" aria-hidden="true" />
       {intro&&motion&&<div className="campus-cinematic-overlay"><div><p>TYMUR ABBASOV / SOFTWARE &amp; AI ENGINEERING</p><h3>Enter the system.</h3><span>An interactive engineering portfolio. Five facilities, one connected world.</span></div><button type="button" onClick={()=>{stopIntro();requestAnimationFrame(()=>mapRef.current?.focus({preventScroll:true}));}}>Skip intro →</button></div>}
       <header className="campus-header">
-        <div className="campus-heading"><p className="campus-kicker">INTERACTIVE ENGINEERING PORTFOLIO</p>{active?<h2>Engineering <span>avenue.</span></h2>:<h1>Tymur <span>Abbasov.</span></h1>}<p className="campus-role">Full-stack engineer · Local AI &amp; LLM systems</p>{!active&&<p className="campus-intro-copy">A city built around my work. Explore the buildings to discover projects, architecture and engineering workflows.</p>}
-          {!active&&<div className="campus-arrival-links"><a className="campus-classic-link" href={window.location.pathname.endsWith('/preview-campus.html')?'./#projects':'#projects'}>View projects ↗</a><a className="campus-classic-link" href={window.location.pathname.endsWith('/preview-campus.html')?'./#contact':'#contact'}>Get in touch ↗</a></div>}
+        <div className="campus-heading"><p className="campus-kicker">INTERACTIVE ENGINEERING PORTFOLIO</p>{active?<h2>Engineering <span>avenue.</span></h2>:<h1>Tymur <span>Abbasov.</span></h1>}<p className="campus-role">Full-stack engineer · Local AI &amp; LLM systems</p>{!active&&<p className="campus-intro-copy">Full-stack software, private AI systems and reliable infrastructure. Explore my work through five connected facilities.</p>}
+          <div className="campus-arrival-links" aria-label="Professional links">
+            <a className="campus-classic-link" href={contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+            <a className="campus-classic-link" href={contact.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+            <a className="campus-classic-link" href="#services">Services ↓</a>
+            <a className="campus-classic-link" href="./classic/">Classic portfolio ↗</a>
+          </div>
           <div className="campus-stage-label"><span aria-hidden="true"/><div>{active?`${interior?'INTERIOR':'FACILITY'} ${active.label} / ${active.name}`:'DISTRICT OVERVIEW / MULTILEVEL TRANSIT'}</div></div>
         </div>
         <div className="campus-controls" aria-label="Scene settings">
@@ -1152,7 +1146,7 @@ export default function EngineeringCampus() {
       </div>
       <button className="campus-interior-link" type="button" aria-expanded={demoOpen} onClick={()=>{if(demoOpen){setDemoOpen(false);}else{setInterior(true);setDemoOpen(true);}}}>{demoOpen?'Close workflow demo':'Run interactive project demo ↗'}</button>
       {demoOpen&&<CampusProjectDemo key={active.id} id={active.id} motion={motion} onStep={setTopic}/>}
-      <a className="campus-spatial-link" href={window.location.pathname.endsWith('/preview-campus.html')?`./${active.section}`:active.section}>{dossier.route} <span aria-hidden="true">↗</span></a>
+      <a className="campus-spatial-link" href={`./classic/${active.section}`}>{dossier.route} <span aria-hidden="true">↗</span></a>
       <div className="campus-spatial-nav"><button type="button" disabled={activeIndex<=0} onClick={()=>goTo(zones[activeIndex-1].id)}>← Previous</button><span>{active.label} / 05</span><button type="button" disabled={activeIndex>=zones.length-1} onClick={()=>goTo(zones[activeIndex+1].id)}>Next →</button></div>
     </aside>}
     <nav className="campus-directory" aria-label="Engineering avenue facilities">

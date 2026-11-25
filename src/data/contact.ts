@@ -1,31 +1,38 @@
-// Single source of truth for the contact section.
-// TODO: replace the placeholder handles below with the real ones before deploying.
+// Single source of truth for public professional contact links.
+// Add an email only after the owner confirms that it is intended for publication.
 export const contact = {
-  name: 'Timur',
-  email: 'timur@example.com',
-  github: 'https://github.com/timur',
-  linkedin: 'https://linkedin.com/in/timur',
+  name: 'Tymur Abbasov',
+  email: '' as string,
+  github: 'https://github.com/Hedun20',
+  linkedin: 'https://www.linkedin.com/in/tymur-abbasov/',
   locationLabel: 'Location',
-  location: 'Available for remote work worldwide',
-} as const
+  location: 'Germany · Remote collaboration',
+} as const;
 
-export const contactLinks = [
-  {
-    key: 'email',
+type ContactLink = {
+  key: 'email' | 'github' | 'linkedin';
+  label: string;
+  href: string;
+  description: string;
+};
+
+export const contactLinks: ContactLink[] = [
+  ...(contact.email ? [{
+    key: 'email' as const,
     label: 'Email',
     href: `mailto:${contact.email}`,
     description: contact.email,
-  },
+  }] : []),
   {
     key: 'github',
     label: 'GitHub',
     href: contact.github,
-    description: 'Open-source projects and code samples',
+    description: 'Projects and code samples',
   },
   {
     key: 'linkedin',
     label: 'LinkedIn',
     href: contact.linkedin,
-    description: 'Professional network and updates',
+    description: 'Professional network and opportunities',
   },
-] as const
+];
