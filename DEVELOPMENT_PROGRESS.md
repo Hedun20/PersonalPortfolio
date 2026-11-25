@@ -1,6 +1,6 @@
 # Development Progress
 
-> **Last updated:** 2026-11-25 · energy-network iteration based on `ab21902` · candidate, not accepted.
+> **Last updated:** 2026-11-25 · reactor architecture iteration based on `c2484f4` · candidate, not accepted.
 
 ## Current Snapshot
 
@@ -11,7 +11,8 @@
 - `336a574` / `f5b964f`: production campus entry, mobile navigation and reduced-motion improvements, browser smoke tests.
 - `d1bdc39` / `ef08e45`: city-first home, classic route, service cards, hidden document scrollbar with scrolling retained.
 - `ab21902`: street-life experiment and clearer optional project walkthrough. Owner rejected the urban simulation aesthetic; the walkthrough remains.
-- This candidate: remove all exterior NPCs, vehicles, elevated shuttles, cafes and fountain from the active campus. Reuse existing facility layout and elevated supports for original half-dome fusion core, shader-driven energy rings, radial facility feeds and perimeter relays. No external assets or new dependencies.
+- `c4a681c` / `c2484f4`: removed exterior NPCs, vehicles, elevated shuttles, cafes and fountain; added energy rings and initial core. Owner requested higher architectural fidelity.
+- This candidate: replace simple core with a larger machined containment assembly, segmented metallic armor, copper coil packs, arched ribs, glass chamber, plasma filament shader and restrained field animation. Static geometry is merged by finish (five batches), with fewer segments on narrow screens. Add metal housings, paired rails and multiple light strands to energy channels. Keep existing buildings and navigation; no external assets or dependencies.
 
 ### Verification and blockers
 - No lint/build/browser run on this candidate SHA yet. Run the README commands before acceptance. The available remote repository connection does not provide a local dependency installation or browser runtime.

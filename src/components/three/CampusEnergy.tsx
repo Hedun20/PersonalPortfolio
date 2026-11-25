@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { FusionReactor } from './FusionReactor';
+import { ArchitecturalFinish } from './CampusMaterials';
 
 const CENTER_Z = 4;
 const NO_RAYCAST = () => null;
-const TAU = Math.PI * 2;
 
 type Channel = {
   radius: number;
@@ -42,9 +43,13 @@ const fragmentShader = `
     float spine = exp(-across * across * 20.0);
     float halo = exp(-across * across * 3.6);
     float envelope = smoothstep(0.0, 0.025, vUv.x) * (1.0 - smoothstep(0.975, 1.0, vUv.x));
-    float strength = 0.22 + 2.6 * head + tail;
-    vec3 light = uColor * (0.12 * halo + spine * strength) + vec3(0.5,0.8,1.0) * spine * head * 1.6;
-    gl_FragColor = vec4(light, envelope * (0.28 * halo + 0.72 * spine));
+    float strandDistance = (across - 0.36) * 9.0;
+    float strands = exp(-strandDistance * strandDistance);
+    float modulation = 0.70 + 0.30 * sin(vUv.x * 145.0 - uTime * uSpeed * 5.0);
+    float strength = 0.42 + 2.1 * head + tail;
+    vec3 light = uColor * (0.20 * halo + spine * strength + strands * modulation * 0.85)
+      + vec3(0.36,0.7,1.0) * spine * head * 1.15;
+    gl_FragColor = vec4(light, envelope * min(1.0, 0.27 * halo + 0.65 * spine + 0.5 * strands));
     #include <colorspace_fragment>
   }
 `;
@@ -114,13 +119,27 @@ function EnergyRibbon({ geometry, color, speed, phase, packets, motion }: {
 
 function RingChannel({ channel, motion }: { channel: Channel; motion: boolean }) {
   const { radius, width, height, end, color, speed, phase, packets } = channel;
-  const geometry = useMemo(() => ringGeometry(radius, width, height, end), [radius, width, height, end]);
-  return <EnergyRibbon geometry={geometry} color={color} speed={speed} phase={phase} packets={packets} motion={motion}/>;
+  const geometry = useMemo(() => ringGeometry(radius, width, height+.055, end), [radius, width, height, end]);
+  const housing = useMemo(() => ringGeometry(radius,width+.28,height+.012,end),[radius,width,height,end]);
+  const rails = useMemo(()=>[-1,1].map(side=>ringGeometry(radius+side*(width*.5+.08),.075,height+.043,end)),[radius,width,height,end]);
+  useEffect(()=>()=>{housing.dispose();rails.forEach(g=>g.dispose());},[housing,rails]);
+  return <group>
+    <mesh geometry={housing} raycast={NO_RAYCAST}><meshStandardMaterial color="#263b4a" metalness={.78} roughness={.38} side={THREE.DoubleSide}/></mesh>
+    {rails.map((rail,index)=><mesh key={index} geometry={rail} raycast={NO_RAYCAST}><meshStandardMaterial color="#718a9b" metalness={.83} roughness={.28} emissive={color} emissiveIntensity={.11} side={THREE.DoubleSide}/></mesh>)}
+    <EnergyRibbon geometry={geometry} color={color} speed={speed} phase={phase} packets={packets} motion={motion}/>
+  </group>;
 }
 
 export function FacilityEnergyLink({ angle, color, motion }: { angle: number; color: string; motion: boolean }) {
-  const geometry = useMemo(() => radialGeometry(angle, 3.45, 13.9, .66, .13), [angle]);
-  return <EnergyRibbon geometry={geometry} color={color} speed={.88} phase={angle} packets={3} motion={motion}/>;
+  const geometry = useMemo(() => radialGeometry(angle, 4.18, 13.9, .74, .17), [angle]);
+  const housing = useMemo(() => radialGeometry(angle, 4.18, 13.9, 1.07, .13), [angle]);
+  const left = useMemo(() => radialGeometry(angle-.001, 4.18, 13.9, 1.00, .15), [angle]);
+  useEffect(()=>()=>{housing.dispose();left.dispose();},[housing,left]);
+  return <group>
+    <mesh geometry={housing} raycast={NO_RAYCAST}><ArchitecturalFinish color="#1b303d" finish="titanium" detail={false}/></mesh>
+    <mesh geometry={left} raycast={NO_RAYCAST}><meshStandardMaterial color="#3e5868" metalness={.72} roughness={.38} side={THREE.DoubleSide}/></mesh>
+    <EnergyRibbon geometry={geometry} color={color} speed={.88} phase={angle} packets={3} motion={motion}/>
+  </group>;
 }
 
 const channels: Channel[] = [
@@ -136,81 +155,10 @@ const channels: Channel[] = [
   { radius: 46.7, width: .95, height: -.065, end: 1.68, color: '#4bbfdd', speed: .4, phase: .75, packets: 11 },
 ];
 
-const plasmaVertex = `
-  varying vec3 vLocal;
-  varying vec3 vNormal;
-  varying vec3 vView;
-  void main() {
-    vLocal = position;
-    vNormal = normalize(normalMatrix * normal);
-    vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
-    vView = -viewPosition.xyz;
-    gl_Position = projectionMatrix * viewPosition;
-  }
-`;
-const plasmaFragment = `
-  varying vec3 vLocal;
-  varying vec3 vNormal;
-  varying vec3 vView;
-  uniform float uTime;
-  void main() {
-    vec3 p = normalize(vLocal);
-    float stripe = 0.5 + 0.5 * sin(p.y * 20.0 + p.x * 7.0 + sin(p.z * 12.0 + uTime) * 1.8 - uTime * 2.2);
-    float filament = stripe * stripe * stripe * stripe;
-    float rim = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
-    rim *= rim;
-    float beat = 0.90 + 0.10 * sin(uTime * 2.3);
-    vec3 color = (vec3(0.025, 0.16, 0.31) + vec3(0.09, 0.58, 1.02) * filament + vec3(0.40, 1.12, 1.55) * rim) * beat;
-    gl_FragColor = vec4(color, 1.0);
-    #include <colorspace_fragment>
-  }
-`;
-
-function FusionCore({ motion }: { motion: boolean }) {
-  const plasma = useRef<THREE.Mesh>(null);
-  const plasmaMaterial = useRef<THREE.ShaderMaterial>(null);
-  const plasmaUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
-  const field = useRef<THREE.Group>(null);
-  const elapsed = useRef(0);
-  useFrame((_, dt) => {
-    if (!motion) return;
-    elapsed.current += Math.min(dt, .05);
-    const t = elapsed.current;
-    if (plasma.current) plasma.current.scale.setScalar(1 + .055 * Math.sin(t * 2.3));
-    if (plasmaMaterial.current) plasmaMaterial.current.uniforms.uTime.value = t;
-    if (field.current) field.current.rotation.y = t * .19;
-  });
-  return <group position={[0, .02, CENTER_Z]} raycast={NO_RAYCAST}>
-    <mesh position={[0,.12,0]}><cylinderGeometry args={[3.15,3.38,.24,64]}/><meshStandardMaterial color="#243b4e" metalness={.76} roughness={.32}/></mesh>
-    <mesh position={[0,.27,0]}><cylinderGeometry args={[2.76,3.1,.13,64]}/><meshStandardMaterial color="#10232f" metalness={.6} roughness={.3}/></mesh>
-    {[2.5,2.88,3.19].map((radius,i)=><mesh key={radius} position={[0,.36+i*.025,0]} rotation={[-Math.PI/2,0,0]}>
-      <torusGeometry args={[radius,i===1?.065:.035,8,80]}/><meshStandardMaterial color="#5bd9ff" emissive={i===1?'#89ddff':'#4ca2ef'} emissiveIntensity={i===1?2.8:1.7} toneMapped={false}/>
-    </mesh>)}
-    <mesh ref={plasma} position={[0,.38,0]}>
-      <sphereGeometry args={[1.58,32,20,0,TAU,0,Math.PI/2]}/><shaderMaterial ref={plasmaMaterial} uniforms={plasmaUniforms} vertexShader={plasmaVertex} fragmentShader={plasmaFragment} toneMapped={false}/>
-    </mesh>
-    <mesh position={[0,.38,0]}>
-      <sphereGeometry args={[2.08,24,12,0,TAU,0,Math.PI/2]}/><meshBasicMaterial color="#70caff" wireframe transparent opacity={.22} depthWrite={false} toneMapped={false}/>
-    </mesh>
-    <group ref={field} position={[0,.38,0]}>
-      {Array.from({length:4},(_,i)=><mesh key={i} rotation={[Math.PI/2-.22,i*Math.PI/4,0]}>
-        <torusGeometry args={[2.19,.023,6,64]}/><meshBasicMaterial color={i%2?'#a69bff':'#86eaff'} toneMapped={false} transparent opacity={.72}/>
-      </mesh>)}
-    </group>
-    {Array.from({length:12},(_,i)=>{
-      const angle=i/12*TAU;
-      return <group key={i} position={[Math.sin(angle)*2.82,.39,Math.cos(angle)*2.82]} rotation={[0,angle,0]}>
-        <mesh><boxGeometry args={[.57,.29,.46]}/><meshStandardMaterial color="#456479" metalness={.7} roughness={.35}/></mesh>
-        <mesh position={[0,.16,0]}><boxGeometry args={[.42,.045,.36]}/><meshBasicMaterial color="#8be4ff" toneMapped={false}/></mesh>
-      </group>;
-    })}
-  </group>;
-}
-
 export function CampusEnergy({ motion, focused }: { motion: boolean; focused: boolean }) {
   const narrow = useThree(state => state.size.width < 900);
   return <group>
-    <FusionCore motion={motion}/>
+    <FusionReactor motion={motion}/>
     {channels.map((channel,index)=> (!narrow || index!==9) && <RingChannel key={channel.radius} channel={channel} motion={motion}/>)}
     {[-1.68,-1.12,-.56,0,.56,1.12,1.68].filter((_,i)=>!narrow||i%2===0).map(angle=><PeripheralFeed key={angle} angle={angle} motion={motion && !focused} end={narrow?35.7:46.7}/>)}
   </group>;

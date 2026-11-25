@@ -9,7 +9,7 @@ Transform the PersonalPortfolio project into an immersive 3D engineering portfol
 - **Vibe**: Professional, technical, futuristic but grounded
 
 ## Energy network visual direction
-- Original low-profile hemispherical fusion core surrounded by animated cyan/violet energy channels, facility feeds and elevated conduits.
+- Original hemispherical fusion reactor with machined containment armor, copper coils, glass chamber and plasma filaments. Surround it with engineered metallic cyan/violet energy conduits, facility feeds and elevated channels.
 - No civilian NPCs, vehicles, cafes or road markings in the active exterior. Preserve the five existing interactive facilities, interiors and accessibility fallback.
 - The fusion/quantum styling is a fictional visual metaphor for connected software systems, not a claim about physical technology.
 
