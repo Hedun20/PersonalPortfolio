@@ -117,3 +117,12 @@ main section[id] {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Keep the immersive city edge-to-edge without disabling document scrolling. */
+html.campus-page {
+  scrollbar-width: none;
+}
+
+html.campus-page::-webkit-scrollbar {
+  display: none;
+}

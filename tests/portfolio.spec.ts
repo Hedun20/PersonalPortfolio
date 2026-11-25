@@ -38,3 +38,14 @@ test('mobile menu is hidden until opened and supports native anchors and Escape'
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(toggle).toBeFocused();
 });
+
+
+test('campus hides the document scrollbar but services remain reachable', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveCSS('scrollbar-width', 'none');
+  await page.getByRole('link', { name: 'Services ↓', exact: true }).click();
+  await expect(page).toHaveURL(/#services$/);
+  await expect(page.locator('#services')).toBeInViewport();
+  await page.goto('/classic/');
+  await expect(page.locator('html')).not.toHaveClass(/campus-page/);
+});
