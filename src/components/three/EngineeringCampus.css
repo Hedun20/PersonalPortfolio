@@ -1,0 +1,188 @@
+.campus{--campus-ink:#eaf4ff;--campus-accent:#72d8ff;position:relative;isolation:isolate;min-height:100svh;background:#080f18;color:var(--campus-ink);overflow:hidden}
+.campus-stage{position:relative;min-width:0;height:clamp(640px,100svh,1200px);background:#080f18;overflow:hidden}
+.campus-topfade{position:absolute;inset:0;background:linear-gradient(180deg,#080f18ee 0%,#080f1866 16%,transparent 35%,transparent 76%,#080f18b3 94%,#080f18);pointer-events:none}
+.campus-header{position:absolute;inset:0 0 auto;display:flex;justify-content:space-between;align-items:start;gap:20px;padding:clamp(20px,4vw,56px);pointer-events:none}
+.campus-kicker{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--campus-accent);margin:0 0 12px;text-transform:uppercase}
+.campus-header h2{font-family:var(--font-heading,system-ui);font-size:clamp(32px,4.6vw,72px);font-weight:700;letter-spacing:-.065em;line-height:1.02;margin:0 0 9px}
+.campus-header h2 span{color:var(--campus-accent)}
+.campus-header p:not(.campus-kicker){margin:0;color:#a2b3c6;font-size:clamp(12px,1.3vw,16px)}
+.campus-controls{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;pointer-events:auto}
+.campus-controls button,.campus-dossier button{color:#c4d6e7;border:1px solid #426079;background:#0b1724d9;padding:9px 12px;border-radius:3px;font-size:12px;white-space:nowrap}
+.campus-controls button:hover,.campus-dossier button:hover{background:#1b3448;color:white}
+.campus-controls button[aria-pressed=true]{border-color:#78bfdf;color:#a1e6ff}
+.campus-stage-label{position:absolute;top:clamp(138px,15vw,200px);left:clamp(20px,4vw,56px);display:flex;align-items:center;gap:8px;font-size:10px;color:#b6d9e8;font-weight:600;letter-spacing:.15em;pointer-events:none;text-transform:uppercase}
+.campus-stage-label span{width:6px;height:6px;border-radius:50%;background:#72d8ff;box-shadow:0 0 12px #72d8ff}
+.campus-hint{position:absolute;bottom:122px;left:20px;right:20px;text-align:center;font-size:11px;color:#a7b9ca;letter-spacing:.035em;pointer-events:none}
+.campus-map-label{font-family:var(--font-body,system-ui);white-space:nowrap;font-size:10px;font-weight:600;letter-spacing:.035em;padding:6px 9px;border-bottom:1px solid #659bb5;background:#07131edb;color:#dcebf5;box-shadow:0 3px 12px #0004;pointer-events:none}
+.campus-map-label span{color:#72d8ff;margin-right:6px}.campus-map-label.is-focused{background:#17374d;color:#fff;border-color:#a2ecff}
+.campus-directory{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:12px clamp(20px,4vw,56px) 22px;background:linear-gradient(0deg,#080f18 0%,#080f18e8 65%,transparent)}
+.campus-directory-title{display:flex;justify-content:space-between;color:#8fa6bd;font-size:10px;font-weight:700;letter-spacing:.16em;margin:0 0 10px}.campus-directory-title span{color:#72d8ff}
+.campus-stops{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.campus-zone{display:grid;grid-template-columns:20px 1fr 12px;align-items:center;gap:6px;text-align:left;padding:11px 7px;border:0;border-top:1px solid #304457;background:#1121318c;color:#dbe8f4;min-height:50px;font-size:12px;line-height:1.3;transition:background .2s,border-color .2s}
+.campus-zone:hover,.campus-zone.is-selected{background:#243b50;border-color:var(--zone-color)}
+.campus-number{font-size:10px;color:var(--zone-color);font-variant-numeric:tabular-nums}.campus-arrow{color:var(--zone-color);text-align:right}
+.campus-dossier{position:absolute;z-index:3;top:clamp(155px,21vh,220px);right:clamp(18px,4vw,56px);width:min(380px,34%);padding:23px 24px;background:linear-gradient(145deg,#142637f2,#08121bed);border-left:2px solid var(--zone-color);box-shadow:0 18px 64px #0008;backdrop-filter:blur(12px);animation:campus-enter .35s ease-out;outline:none;max-height:calc(100% - 280px);overflow:auto}
+@keyframes campus-enter{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+.campus-dossier-top{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-bottom:22px;font-size:10px;letter-spacing:.12em;color:var(--zone-color)}
+.campus-dossier-top button{padding:7px 8px;font-size:10px;letter-spacing:0}
+.campus-dossier .campus-kicker{color:var(--zone-color);font-size:10px;margin-bottom:8px}
+.campus-dossier h3{font-family:var(--font-heading,system-ui);font-size:clamp(25px,3vw,40px);letter-spacing:-.045em;line-height:1.08;margin:0 0 15px}
+.campus-dossier-intro{font-size:13px;line-height:1.65;color:#b9c9d8;margin:0 0 22px}
+.campus-dossier-capabilities>p{font-size:10px;letter-spacing:.15em;color:#92a9bc;margin:0 0 8px}
+.campus-dossier-capabilities>div{display:flex;align-items:center;gap:12px;font-size:12px;color:#e1ebf3;padding:9px 0;border-top:1px solid #2b4053}
+.campus-dossier-capabilities>div span{font-size:10px;color:var(--zone-color)}
+.campus-work-link{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding:12px;color:#08131d!important;background:var(--zone-color);font-size:12px;font-weight:700;text-decoration:none!important}
+.campus-dossier-nav{display:flex;justify-content:space-between;gap:7px;margin-top:10px}.campus-dossier-nav button{font-size:11px;padding:7px 8px}.campus-dossier-nav button:disabled{opacity:.3;cursor:default}
+.campus button:focus-visible,.campus a:focus-visible,.campus-dossier:focus-visible{outline:2px solid #9ae4ff;outline-offset:3px}
+.campus-fallback{height:100%;min-height:300px;display:grid;place-items:center;text-align:center;padding:50px;color:#b6cadc;background:radial-gradient(ellipse,#1a3348,#080f18 68%)}.campus-fallback p{max-width:320px}
+@media(max-width:900px){.campus-stage{height:clamp(560px,80svh,760px)}.campus-header{flex-direction:column;gap:12px}.campus-controls{justify-content:start}.campus-stage-label{top:180px}.campus-directory{position:relative;padding-top:14px}.campus-stops{grid-template-columns:repeat(5,minmax(132px,1fr));overflow-x:auto;padding:3px 3px 7px}.campus-hint{bottom:18px;font-size:10px}.campus-dossier{position:relative;top:auto;right:auto;width:auto;margin:0 20px 18px;max-height:none}.campus-map-label{font-size:9px;padding:4px 5px}}
+@media(max-width:480px){.campus-header{padding:20px 16px}.campus-kicker{font-size:9px;letter-spacing:.12em}.campus-stage-label{left:16px;top:170px}.campus-controls button{padding:7px 8px;font-size:10px}.campus-stage{height:62svh;min-height:470px}.campus-directory{padding:10px 16px 18px}.campus-dossier{margin:0 16px 14px;padding:18px}.campus-hint{line-height:1.4}}
+@media(prefers-reduced-motion:reduce){.campus-zone{transition:none}.campus-dossier{animation:none}}
+
+/* Avenue V3 — compact, frameless city HUD. */
+.campus{--campus-accent:#79e4ff;background:#080f18}
+.campus-topfade{background:linear-gradient(180deg,#080f18ed 0%,#080f1852 13%,transparent 29%,transparent 82%,#080f18b3 95%,#080f18)}
+.campus-header{padding:clamp(18px,3vw,44px)}
+.campus-header h2{font-size:clamp(32px,4.3vw,64px);letter-spacing:-.065em}
+.campus-kicker{letter-spacing:.22em}
+.campus-stage-label{top:clamp(126px,12vw,170px);left:clamp(18px,3vw,44px)}
+.campus-directory{padding:10px clamp(18px,3vw,44px) 18px;background:linear-gradient(0deg,#080f18 0%,#080f18df 63%,transparent)}
+.campus-zone{min-height:46px;background:#102231be;border-top:1px solid #395268;padding:10px 12px}
+.campus-zone:hover,.campus-zone.is-selected{box-shadow:inset 0 2px 0 var(--zone-color);background:#20384b}
+.campus-map-label{background:#081720e8;border-bottom:1px solid #5aa2bd;letter-spacing:.07em;font-size:10px}
+.campus-dossier{top:clamp(140px,18vh,195px);width:min(420px,35%);max-height:calc(100% - 250px);padding:22px 24px;background:linear-gradient(135deg,#142a3beb,#07121af5);border-top:1px solid #3c6176;box-shadow:0 18px 64px #0009}
+.campus-dossier-top{margin-bottom:17px}.campus-dossier h3{font-size:clamp(24px,2.8vw,38px)}
+.campus-dossier-intro{margin-bottom:16px}.campus-case{border:1px solid #345268;border-left:2px solid var(--zone-color);padding:13px 14px;margin-bottom:19px;background:#0a1927a8}
+.campus-case-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px 10px;font-size:9px;letter-spacing:.12em;color:#99b4c7}.campus-case-meta span:last-child{color:var(--zone-color)}
+.campus-case h4{margin:10px 0 5px;font-size:15px;font-weight:650;color:#edf7ff;line-height:1.3}.campus-case p{margin:0;font-size:12px;line-height:1.65;color:#b6c9d9}
+.campus-dossier-capabilities>div{padding:7px 0}.campus-hint{bottom:105px}
+@media(max-width:900px){.campus-dossier{position:relative;top:auto;right:auto;width:auto;max-height:none}.campus-stage-label{top:174px}.campus-hint{bottom:18px}.campus-zone{padding:9px 7px}}
+@media(max-width:480px){.campus-header{padding:18px 16px}.campus-stage-label{top:170px;left:16px}.campus-dossier{padding:18px}.campus-directory{padding:10px 16px 16px}}
+
+/* Avenue V4: restrained premium architectural wayfinding. */
+.campus-map-label{font-size:10px;font-weight:650;letter-spacing:.045em;padding:7px 10px;border:1px solid #739eaa47;border-bottom:1px solid #9cd9ec;background:linear-gradient(120deg,#132634f2,#09131de8);box-shadow:0 5px 20px #0006}
+.campus-map-label span{font-size:9px;letter-spacing:.12em;color:#a4e6f2}
+.campus-map-label.is-focused{background:#193c50;border-color:#b1eaff}
+.campus-directory-title{color:#a2b8c8;letter-spacing:.2em}
+.campus-zone{background:linear-gradient(120deg,#1b2c38dc,#0c1823dc);border-top-color:#506676}
+.campus-zone.is-selected,.campus-zone:hover{background:linear-gradient(120deg,#284657,#102331)}
+.campus-controls button{border-color:#4e6b7e;background:#101e29dc;letter-spacing:.015em}
+@media(max-width:900px){.campus-map-label{font-size:9px;padding:4px 6px}}
+
+/* Avenue V5 — city as navigation, readable facility pages instead of narrow overlays. */
+.campus-stage-label{top:clamp(120px,11vw,158px)}
+.campus-topfade{background:linear-gradient(180deg,#080f18e8 0%,#080f185c 12%,transparent 26%,transparent 80%,#080f18a0 94%,#080f18)}
+.campus-inspect{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);width:max-content;background:#101f2aed;border:1px solid #4a6271;border-left:2px solid var(--zone-color);padding:12px 14px;box-shadow:0 12px 40px #0008;z-index:2}
+.campus-inspect div{display:flex;flex-direction:column;gap:4px}.campus-inspect div span{font-size:9px;letter-spacing:.18em;color:var(--zone-color)}.campus-inspect strong{font-size:13px;font-weight:650}
+.campus-inspect button,.campus-facility-page button{border:1px solid #536775;color:#e0ecf2;background:#142531;padding:11px 13px;min-height:40px;font-size:12px;font-weight:600;cursor:pointer}.campus-inspect button:hover,.campus-facility-page button:hover:not(:disabled){border-color:var(--zone-color);background:#263d4b}
+.campus-facility-page{position:fixed;inset:0;margin:auto;width:min(1080px,calc(100% - 48px));max-width:none;max-height:calc(100dvh - 48px);padding:0;border:1px solid #4c6677;border-top:2px solid var(--zone-color);background:#0b151f;color:#e8f2f7;box-shadow:0 30px 130px #000c;overflow:auto;overscroll-behavior:contain;font-family:var(--font-body,system-ui,sans-serif);scrollbar-color:#506f80 #101c26}
+.campus-facility-page::backdrop{background:#03090edb;backdrop-filter:blur(9px)}
+.campus-facility-page[open]{animation:campus-page-enter .24s ease-out}
+@keyframes campus-page-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+body:has(.campus-facility-page[open]){overflow:hidden}
+.campus-facility-top,.campus-facility-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(18px,4vw,42px);border-bottom:1px solid #293e4c;background:#101e29}
+.campus-facility-top>span,.campus-facility-bottom>span{font-size:10px;letter-spacing:.16em;color:#a8c3d2;white-space:nowrap;font-variant-numeric:tabular-nums}
+.campus-facility-top{position:sticky;top:0;z-index:1}
+.campus-facility-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,24%);gap:24px;align-items:center;padding:clamp(25px,4vw,52px) clamp(18px,4vw,42px);background:radial-gradient(ellipse at 91% 40%,#294453 0%,#0b151f 54%);border-bottom:1px solid #344b59}
+.campus-facility-hero .campus-kicker,.campus-facility-skills .campus-kicker{color:var(--zone-color);font-size:10px;margin:0 0 12px}.campus-facility-hero h3{font-family:var(--font-heading,system-ui);font-size:clamp(34px,5vw,62px);font-weight:700;line-height:1.04;letter-spacing:-.055em;margin:0 0 18px;color:#f1f6f9;outline:none}.campus-facility-intro{margin:0;color:#b9cbd6;line-height:1.75;font-size:15px;max-width:600px}
+.campus-facility-emblem{align-self:stretch;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:130px;color:var(--zone-color);border:1px solid #6c87934d;background:repeating-linear-gradient(90deg,transparent 0 23px,#68879715 23px 24px),repeating-linear-gradient(0deg,transparent 0 23px,#68879715 23px 24px);position:relative}
+.campus-facility-emblem:before,.campus-facility-emblem:after{content:'';position:absolute;width:62%;aspect-ratio:1;border:1px solid currentColor;opacity:.2;transform:rotate(45deg)}.campus-facility-emblem:after{width:48%}.campus-facility-emblem span{font-size:clamp(46px,7vw,84px);font-weight:300;letter-spacing:-.06em;z-index:1}.campus-facility-emblem small{font-size:8px;letter-spacing:.14em;z-index:1;text-align:center}
+.campus-facility-content{display:grid;grid-template-columns:1.3fr 1fr;gap:clamp(18px,3vw,30px);padding:clamp(20px,3vw,35px) clamp(18px,4vw,42px)}
+.campus-facility-case,.campus-facility-skills{border:1px solid #334956;padding:clamp(17px,2.5vw,26px);background:linear-gradient(145deg,#142430,#0c1720);min-width:0}.campus-facility-case{border-top:2px solid var(--zone-color)}
+.campus-facility-case h4,.campus-facility-skills h4{font-family:var(--font-heading,system-ui);font-weight:650;font-size:clamp(20px,2.5vw,29px);line-height:1.2;letter-spacing:-.03em;margin:15px 0;color:#f0f5f8}.campus-facility-case p{font-size:14px;line-height:1.7;color:#bfd0da;margin:0 0 14px}.campus-facility-case .campus-facility-caption{font-size:12px;color:#a1b6c3;border-top:1px solid #344b59;padding-top:12px;margin-top:20px}
+.campus-facility-skills>div{display:flex;align-items:center;gap:12px;border-top:1px solid #344956;padding:12px 0;font-size:13px;color:#dce7ed}.campus-facility-skills>div span{font-size:10px;color:var(--zone-color)}.campus-facility-skills button{margin-top:16px;width:100%;text-align:left}
+.campus-facility-bottom{border-bottom:0;border-top:1px solid #293e4c}.campus-facility-bottom button:disabled{opacity:.33;cursor:default}.campus-facility-page a:focus-visible,.campus-facility-page button:focus-visible,.campus-inspect button:focus-visible{outline:2px solid var(--zone-color);outline-offset:3px}
+@media(max-width:900px){.campus-stage-label{top:174px}.campus-inspect{bottom:45px}.campus-facility-hero{grid-template-columns:minmax(0,1fr) minmax(95px,22%)}}
+@media(max-width:620px){.campus-facility-page{width:100%;height:100dvh;max-height:100dvh;margin:0;border-left:0;border-right:0}.campus-facility-top,.campus-facility-bottom{padding:12px}.campus-facility-top>span{display:none}.campus-facility-hero,.campus-facility-content{grid-template-columns:1fr;gap:16px}.campus-facility-emblem{display:none}.campus-facility-bottom>span{display:none}.campus-facility-bottom button{flex:1}.campus-inspect{gap:7px;padding:8px 10px}.campus-inspect button{padding:8px;white-space:nowrap}.campus-inspect strong{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.campus-facility-page[open]{animation:none}}
+.campus-map-label{pointer-events:auto;cursor:pointer}.campus-map-label:hover{border-color:#a9e1f1;background:#234355;color:#fff}
+
+
+/* Avenue V6 — spatial storytelling: live scene, world-space callouts and a light reading rail. */
+.campus-v6 .campus-world-canvas{position:absolute;inset:0;z-index:0;isolation:isolate}
+.campus-v6 .campus-topfade{z-index:9;pointer-events:none;background:linear-gradient(180deg,#080f18e8 0%,#080f1840 15%,transparent 27%,transparent 82%,#080f18c2 97%,#080f18)}
+.campus-v6 .campus-header{z-index:10}
+.campus-v6 .campus-stage-label,.campus-v6 .campus-hint{z-index:10}
+.campus-v6 .campus-directory{z-index:12}
+.campus-v6 .campus-map-label{display:flex;align-items:center;gap:6px;max-width:none;font-size:11px;line-height:1.15;white-space:nowrap;border-radius:2px;padding:6px 9px;color:#edf9ff;background:#0c1b26f0;box-shadow:0 4px 16px #0009}
+.campus-v6 .campus-map-label span{margin:0;font-family:ui-monospace,monospace;color:#91d9ef;font-size:9px}.campus-v6 .campus-map-label strong{font-weight:600}
+.campus-hotspot{--zone-color:#79e4ff;display:flex;align-items:center;gap:6px;padding:5px 8px 5px 5px;white-space:nowrap;font-family:var(--font-body,system-ui);color:#e5f2fa;background:#0a1924ee;border:1px solid #577a8c;border-radius:2px;cursor:pointer;box-shadow:0 5px 20px #0009;font-size:11px}
+.campus-hotspot span{display:grid;place-items:center;min-width:23px;height:23px;background:#1d3547;border:1px solid var(--zone-color);color:var(--zone-color);font-size:9px;font-family:ui-monospace,monospace}.campus-hotspot strong{font-weight:600}
+.campus-hotspot:hover,.campus-hotspot.is-active{border-color:var(--zone-color);background:#21394b}.campus-hotspot.is-active span{background:var(--zone-color);color:#081720}
+.campus-v6 button:focus-visible,.campus-v6 a:focus-visible{outline:2px solid #a7e6ff;outline-offset:3px}
+.campus-spatial-info{position:absolute;z-index:11;right:0;top:clamp(160px,19vh,205px);bottom:118px;width:clamp(300px,32vw,470px);padding:20px clamp(20px,3vw,38px) 20px 23px;overflow:auto;overscroll-behavior:contain;background:linear-gradient(90deg,#080f18bf,#080f18f7 26%,#080f18);color:#dceaf2;scrollbar-color:#3d5c70 transparent;animation:campus-spatial-enter .25s ease-out;border-left:1px solid #57768642}
+@keyframes campus-spatial-enter{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.campus-spatial-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;color:#99acbb;font:10px ui-monospace,monospace;letter-spacing:.08em}
+.campus-spatial-top button,.campus-spatial-nav button{border:0;color:#c4dfed;background:transparent;padding:8px 0;font-size:12px;cursor:pointer;white-space:nowrap}.campus-spatial-top button:hover,.campus-spatial-nav button:hover{color:var(--zone-color)}
+.campus-spatial-eyebrow{font-size:10px;color:var(--zone-color);letter-spacing:.14em;font-weight:650;line-height:1.5;margin:0 0 10px}
+.campus-spatial-info h3{font:700 clamp(25px,3.2vw,45px)/1.06 var(--font-heading,system-ui);letter-spacing:-.055em;color:#eef6fb;margin:0 0 12px;outline:none}
+.campus-spatial-intro{font-size:13px;line-height:1.6;color:#9fb5c5;margin:0 0 24px}
+.campus-spatial-topics{display:flex;flex-wrap:wrap;gap:8px 12px;border-bottom:1px solid #415a6a;padding-bottom:12px}
+.campus-spatial-topics button{display:flex;align-items:center;gap:5px;font-size:11px;color:#acbfcc;background:transparent;border:0;border-bottom:1px solid transparent;padding:6px 0;cursor:pointer;text-align:left;line-height:1.35}.campus-spatial-topics button span{font:10px ui-monospace,monospace;color:var(--zone-color)}.campus-spatial-topics button[aria-pressed=true]{border-color:var(--zone-color);color:#f4fbff}
+.campus-spatial-story{padding:22px 0 17px;animation:campus-spatial-enter .2s ease-out;min-height:145px}.campus-spatial-story h4{font:650 clamp(20px,2.1vw,29px)/1.15 var(--font-heading,system-ui);letter-spacing:-.035em;color:#edf6fb;margin:0 0 11px}.campus-spatial-story>p:not(.campus-spatial-eyebrow){font-size:14px;line-height:1.7;color:#bacdd9;margin:0 0 17px}
+.campus-spatial-tags{display:flex;gap:8px 10px;flex-wrap:wrap}.campus-spatial-tags span{font-size:11px;line-height:1.3;color:#b1c8d7;border-bottom:1px solid #4d6a7b;padding:3px 0}
+.campus-spatial-link{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--zone-color)!important;text-decoration:none!important;font-size:12px;font-weight:650;padding:12px 0;border-top:1px solid #405b6b;border-bottom:1px solid #405b6b}.campus-spatial-link:hover{color:#fff!important}
+.campus-spatial-nav{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px}.campus-spatial-nav span{font:10px ui-monospace,monospace;color:#93adbd}.campus-spatial-nav button:disabled{opacity:.3;cursor:default}
+.campus-v6.campus-entered .campus-hint{right:35%;font-size:10px}
+@media(max-width:900px){.campus-v6.campus-entered .campus-stage{height:clamp(470px,66svh,720px)}.campus-spatial-info{position:relative;inset:auto;width:auto;max-height:none;padding:22px 20px 25px;border-left:0;border-top:1px solid #405b6b;background:#0b1822;overflow:visible}.campus-spatial-top{margin-bottom:15px}.campus-spatial-intro{margin-bottom:15px}.campus-spatial-story{min-height:0}.campus-v6.campus-entered .campus-hint{right:20px}.campus-v6 .campus-map-label{font-size:9px;padding:4px 5px;gap:4px}.campus-hotspot{font-size:10px;padding:4px 5px;gap:4px}.campus-hotspot span{min-width:19px;height:19px}.campus-v6 .campus-directory{position:relative}}
+@media(max-width:480px){.campus-v6 .campus-map-label strong{font-size:9px}.campus-hotspot strong{font-size:9px}.campus-spatial-info{padding:18px 16px 22px}}
+@media(prefers-reduced-motion:reduce){.campus-spatial-info,.campus-spatial-story{animation:none}}
+
+/* Avenue V7: header in normal flow, architectural finish and cutaway entry. */
+.campus-v7 .campus-heading{display:flex;flex-direction:column;align-items:flex-start;min-width:0;max-width:100%}
+.campus-v7 .campus-heading .campus-kicker{margin:0 0 10px}
+.campus-v7 .campus-heading h2{margin:0 0 10px}
+.campus-v7 .campus-heading>p:not(.campus-kicker){line-height:1.45;margin:0}
+.campus-v7 .campus-stage-label{position:static;inset:auto;display:flex;align-items:center;gap:9px;margin:18px 0 0;padding-top:12px;border-top:1px solid #6d9cb34d;line-height:1.5;max-width:100%;white-space:normal;letter-spacing:.12em}
+.campus-v7 .campus-stage-label>span{flex:0 0 6px}
+.campus-v7 .campus-controls .campus-enter-button,.campus-interior-link{background:#142f40;border:1px solid #75bed4;color:#c3f1ff}
+.campus-v7 .campus-controls .campus-enter-button:hover,.campus-interior-link:hover{background:#24475a;color:#fff}
+.campus-interior-link{display:block;width:100%;text-align:left;padding:11px 12px;margin:0 0 12px;font-size:12px;line-height:1.4;font-weight:600;border-radius:2px;cursor:pointer}
+.campus-v7 .campus-spatial-info{top:clamp(218px,27vh,265px)}
+.campus-v7.campus-interior .campus-topfade{background:linear-gradient(180deg,#080f18f0,transparent 34%,transparent 77%,#080f18e0)}
+.campus-v7 .campus-map-label{border:1px solid #6da4ba80;background:#0b1e2af2;box-shadow:0 3px 18px #03080bc2}
+.campus-v7 .campus-map-label:hover{border-color:#b5e9f7;background:#294c60}
+@media(max-width:900px){.campus-v7 .campus-header{gap:9px}.campus-v7 .campus-stage-label{margin-top:10px;padding-top:8px;font-size:9px}.campus-v7 .campus-spatial-info{top:auto}.campus-v7 .campus-controls{gap:5px}.campus-v7 .campus-controls button{padding:7px 9px}.campus-v7 .campus-heading h2{margin-bottom:6px}}
+@media(max-width:480px){.campus-v7 .campus-header{padding:15px 16px}.campus-v7 .campus-heading .campus-kicker{margin-bottom:6px}.campus-v7 .campus-stage-label{font-size:8px;letter-spacing:.08em;margin-top:8px;padding-top:6px}.campus-v7 .campus-heading>p:not(.campus-kicker){font-size:12px}.campus-v7 .campus-controls button{font-size:10px;padding:6px 8px}.campus-v7 .campus-hint{bottom:12px}}
+
+/* Keyboard guidance is unnecessary on touch-only displays. */
+.campus-world-canvas canvas:focus-visible{outline:2px solid #73cfe8;outline-offset:-3px}
+@media(pointer:coarse){.campus-key-hint{display:none}}
+
+/* V12 — cinematic arrival and linked, accessible project simulations. */
+.campus-cinematic-overlay{position:absolute;inset:0;z-index:15;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:clamp(24px,5vw,70px);padding-bottom:clamp(105px,16vh,180px);background:linear-gradient(0deg,#050912ed,transparent 46%);pointer-events:auto}
+.campus-cinematic-overlay p{font:600 10px/1.5 ui-monospace,monospace;letter-spacing:.19em;color:#9ad9ef;margin:0 0 9px}.campus-cinematic-overlay h3{font:700 clamp(36px,6vw,85px)/1 var(--font-heading,system-ui);letter-spacing:-.06em;color:#eff8ff;margin:0 0 12px}.campus-cinematic-overlay span{color:#b4c8d8;font-size:clamp(12px,1.5vw,16px)}.campus-cinematic-overlay button{margin-top:20px;padding:12px 20px;border:1px solid #81cce5;background:#0e2334;color:#d9f5ff;cursor:pointer;font-size:13px}.campus-cinematic .campus-header,.campus-cinematic .campus-hint{visibility:hidden}.campus-cinematic .campus-directory{pointer-events:auto}
+.campus-demo{padding:15px 0 19px;border-top:1px solid #486578}.campus-demo h4{font:650 20px/1.2 var(--font-heading,system-ui);margin:0 0 8px;color:#e6f2fa}.campus-demo-note{font-size:11px;color:#a0b5c4;margin:0 0 12px;line-height:1.5}.campus-demo-stages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.campus-demo-stages button,.campus-demo-actions button{min-height:40px;background:#112735;border:1px solid #40596c;padding:7px;color:#c8dbe6;font-size:11px;text-align:left;cursor:pointer}.campus-demo-stages button span{color:var(--zone-color);margin-right:6px;font:10px ui-monospace,monospace}.campus-demo-stages button[aria-pressed=true]{border-color:var(--zone-color);background:#234354;color:#fff}.campus-demo-io{display:grid;gap:6px;padding:14px 0;color:#d6e6ef;font-size:12px;line-height:1.5}.campus-demo-io>span{font:10px ui-monospace,monospace;letter-spacing:.12em;color:var(--zone-color)}.campus-demo-io>strong{font-weight:550;overflow-wrap:anywhere}.campus-demo-io p{margin:6px 0 0;color:#afc3d0}.campus-demo-actions{display:flex;gap:6px;flex-wrap:wrap}.campus-demo-actions button{flex:1;text-align:center}.campus-demo-actions button:disabled{opacity:.4;cursor:default}.campus-demo-actions button:hover:not(:disabled){border-color:var(--zone-color)}
+@media(max-width:900px){.campus-cinematic-overlay{padding-bottom:35px}.campus-cinematic .campus-stage{height:clamp(470px,78svh,720px)}}
+
+/* V13 — identity-first arrival, reliable contrast and non-blocking loading. */
+.campus-v13 .campus-header{align-items:flex-start;gap:16px;padding:clamp(20px,3vw,46px);}
+.campus-v13 .campus-heading{max-width:min(490px,52vw);padding:16px 22px 16px 0;position:relative;isolation:isolate;text-shadow:0 2px 12px #03080c;}
+.campus-v13 .campus-heading::before{content:"";position:absolute;inset:-20px -36px -15px -46px;z-index:-1;background:radial-gradient(ellipse at 15% 22%,#050b13f5 0%,#050b13dc 39%,#050b1377 66%,transparent 82%);pointer-events:none;}
+.campus-v13 .campus-heading :is(h1,h2){color:#f4f9fc;font-size:clamp(32px,4.2vw,65px);line-height:1.03;letter-spacing:-.055em;margin:0 0 9px;}
+.campus-v13 .campus-kicker{color:#95e5ff;font-size:11px;letter-spacing:.17em;line-height:1.5;}
+.campus-v13 .campus-heading .campus-role{color:#e1edf6;font-weight:650;font-size:clamp(13px,1.35vw,19px);line-height:1.45;margin:0 0 9px;}
+.campus-v13 .campus-heading .campus-intro-copy{max-width:360px;color:#c6d8e5;font-size:13px;line-height:1.55;margin:0 0 9px;}
+.campus-classic-link{pointer-events:auto;color:#a6eaff!important;font-size:12px;line-height:1.5;text-decoration:underline;text-underline-offset:4px;margin-top:2px;}
+.campus-v13 .campus-stage-label{color:#c0dce9;font-size:10px;margin-top:12px;}
+.campus-v13.campus-entered .campus-heading h2{font-size:clamp(28px,3vw,47px);}
+.campus-loading{position:absolute;inset:0;z-index:18;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#152a3b,#060b13 70%);padding:24px;}
+.campus-loading-content{display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;width:min(100%,380px);}
+.campus-loading-emblem{width:74px;height:74px;position:relative;margin-bottom:10px;}
+.campus-loading-emblem i{position:absolute;inset:8px;border:1px solid #72d8ef;transform:rotate(45deg);animation:campus-load-orbit 3s linear infinite;box-shadow:0 0 14px #5ec9ee55;}
+.campus-loading-emblem i:nth-child(2){inset:16px;animation-direction:reverse;}.campus-loading-emblem i:nth-child(3){inset:25px;background:#b1edff;animation:none;}
+.campus-loading-content p{color:#9adcf2;font:600 10px/1.5 ui-monospace,monospace;letter-spacing:.12em;margin:0;}
+.campus-loading-content h3{font:700 clamp(26px,5vw,44px)/1.1 var(--font-heading,system-ui);color:#f2f8fb;letter-spacing:-.04em;margin:0;}
+.campus-loading-content>span{color:#c0d2e0;font-size:13px;}
+.campus-loading-track{height:3px;width:100%;overflow:hidden;background:#263e4f;margin:10px 0 0;}
+.campus-loading-track span{display:block;width:35%;height:100%;background:#9ce9ff;animation:campus-load-slide 1.3s ease-in-out infinite alternate;}
+.campus-loading-content button{margin-top:10px;border:1px solid #547689;background:#102431;color:#e0f2fc;padding:11px 16px;cursor:pointer;}
+@keyframes campus-load-orbit{to{transform:rotate(405deg)}}@keyframes campus-load-slide{to{transform:translateX(185%)}}
+@media(max-width:900px){.campus-v13 .campus-header{gap:8px;padding:15px 16px;}.campus-v13 .campus-heading{max-width:100%;padding:0;}.campus-v13 .campus-heading :is(h1,h2){font-size:clamp(27px,5vw,42px);}.campus-v13 .campus-kicker{font-size:9px;}.campus-v13 .campus-heading .campus-role{font-size:12px;margin-bottom:5px;}.campus-v13 .campus-heading .campus-intro-copy{font-size:11px;max-width:330px;line-height:1.4;margin-bottom:4px;}.campus-v13 .campus-stage-label{font-size:8px;margin-top:6px;padding-top:5px;}.campus-classic-link{font-size:11px;}.campus-v13 .campus-stage{min-height:570px;}}
+@media(prefers-reduced-motion:reduce){.campus-loading-emblem i,.campus-loading-track span{animation:none;}}
+
+.campus-v13 .campus-heading h1{font-family:var(--font-heading,system-ui);font-weight:700}.campus-v13 .campus-heading h1 span{color:var(--campus-accent)}.campus-arrival-links{display:flex;flex-wrap:wrap;gap:6px 18px;pointer-events:auto;}
+
+/* V13.1: a slow GPU must never permanently cover the portfolio. */
+.campus-loading.campus-loading-slow{inset:auto 16px 54px auto;width:min(340px,calc(100% - 32px));padding:16px;background:#0a1824f2;border:1px solid #547689;box-shadow:0 4px 24px #0008;z-index:14}
+.campus-loading-slow .campus-loading-content{gap:7px}.campus-loading-slow .campus-loading-emblem,.campus-loading-slow .campus-loading-content>p,.campus-loading-slow .campus-loading-track{display:none}.campus-loading-slow .campus-loading-content h3{font-size:18px}.campus-loading-slow .campus-loading-content button{margin-top:2px;padding:7px 11px}
